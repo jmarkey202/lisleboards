@@ -1,0 +1,1365 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Lisle Boards</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23183760'/%3E%3Crect x='6' y='7' width='8' height='8' rx='1.5' fill='%2396C0E6'/%3E%3Crect x='18' y='7' width='8' height='12' rx='1.5' fill='%23FFFFFF'/%3E%3Crect x='6' y='18' width='8' height='7' rx='1.5' fill='%23FFFFFF'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+/* Layout: a fixed district header, then one full-width board surface whose
+   arrangement (wall, columns, grid, stream, timeline, table) is set by the board. */
+:root {
+  --lisle-blue: #183760;
+  --light-blue: #96C0E6;
+  --blue-gray:  #AEC5DB;
+  --light-gray: #999B9E;
+  --off-white:  #F4F7F9;
+
+  --bg: #FFFFFF;
+  --surface: #F4F7F9;
+  --card: #FFFFFF;
+  --fg: #183760;
+  --fg-muted: #465F80;        /* Lisle Blue at 80% over white, 6.5:1 */
+  --line: #AEC5DB;
+  --line-soft: #D7E2EE;       /* blue-gray at 50% */
+  --accent: #183760;
+  --accent-fg: #FFFFFF;
+  --accent-soft: #D5E6F5;     /* light blue at 50% */
+  --focus: #183760;
+  --shadow: 0 1px 2px rgba(24,55,96,.10), 0 4px 14px rgba(24,55,96,.08);
+
+  --post-white: #FFFFFF;  --post-white-fg: #183760;
+  --post-mist:  #F4F7F9;  --post-mist-fg:  #183760;
+  --post-sky:   #D5E6F5;  --post-sky-fg:   #183760;
+  --post-slate: #AEC5DB;  --post-slate-fg: #183760;
+  --post-navy:  #183760;  --post-navy-fg:  #FFFFFF;
+
+  --font-head: "Montserrat", "Calibri", system-ui, sans-serif;
+  --font-body: "Source Sans 3", "Source Sans Pro", "Calibri", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0D1F38; --surface: #142C4B; --card: #1E3A5F; --fg: #FFFFFF; --fg-muted: #96C0E6;
+    --line: #2F4D73; --line-soft: #26416A; --accent: #96C0E6; --accent-fg: #183760; --accent-soft: #24507A;
+    --focus: #96C0E6; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.25);
+    --post-white: #1E3A5F; --post-white-fg: #FFFFFF;
+    --post-mist: #1A3556; --post-mist-fg: #FFFFFF;
+    --post-sky: #24507A; --post-sky-fg: #FFFFFF;
+    --post-slate: #2A4B72; --post-slate-fg: #FFFFFF;
+    --post-navy: #0D1F38; --post-navy-fg: #FFFFFF;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0D1F38; --surface: #142C4B; --card: #1E3A5F; --fg: #FFFFFF; --fg-muted: #96C0E6;
+  --line: #2F4D73; --line-soft: #26416A; --accent: #96C0E6; --accent-fg: #183760; --accent-soft: #24507A;
+  --focus: #96C0E6; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.25);
+  --post-white: #1E3A5F; --post-white-fg: #FFFFFF;
+  --post-mist: #1A3556; --post-mist-fg: #FFFFFF;
+  --post-sky: #24507A; --post-sky-fg: #FFFFFF;
+  --post-slate: #2A4B72; --post-slate-fg: #FFFFFF;
+  --post-navy: #0D1F38; --post-navy-fg: #FFFFFF;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 17px; line-height: 1.45; }
+h1, h2, h3, h4 { font-family: var(--font-head); margin: 0; text-wrap: balance; line-height: 1.2; }
+p { margin: 0; }
+a { color: inherit; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+[hidden] { display: none !important; }
+img { max-width: 100%; display: block; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Header */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--lisle-blue); color: #FFFFFF; padding-inline: 16px; padding-block: 10px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+.brand { display: flex; flex-direction: column; min-width: 0; }
+.eyebrow { font-family: var(--font-head); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--light-blue); font-weight: 600; }
+.wordmark { font-family: var(--font-head); font-weight: 800; font-size: 22px; color: #FFFFFF; text-decoration: none; letter-spacing: -.01em; }
+.crumb { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1 1 200px; }
+.crumb .crumb-title { font-family: var(--font-head); font-size: 18px; font-weight: 600; color: #FFFFFF; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin: 0; }
+.crumb .fmt { font-size: 13px; color: var(--light-blue); white-space: nowrap; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-left: auto; }
+.top .btn { background: #FFFFFF; color: var(--lisle-blue); border-color: #FFFFFF; }
+.top .btn.ghost { background: transparent; color: #FFFFFF; border-color: var(--light-blue); }
+.top .btn.ghost:hover { background: rgba(255,255,255,.12); }
+.top input[type="search"] { background: #FFFFFF; color: var(--lisle-blue); border: 1px solid #FFFFFF; border-radius: 8px; padding: 7px 10px; min-width: 0; width: 180px; }
+.top :focus-visible { outline-color: var(--light-blue); }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-fg); border-radius: 8px; padding: 8px 14px; font-family: var(--font-head); font-weight: 600; font-size: 15px; line-height: 1.2; text-decoration: none; }
+.btn:hover { filter: brightness(1.08); }
+.btn.ghost { background: transparent; color: var(--fg); border-color: var(--line); }
+.btn.ghost:hover { background: var(--surface); filter: none; }
+.btn.sm { padding: 5px 10px; font-size: 14px; }
+.btn.danger { border-color: var(--line); background: transparent; color: var(--fg); }
+.btn:disabled { opacity: .5; cursor: not-allowed; filter: none; }
+.icon { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
+
+/* Main surface */
+main { padding-inline: 16px; padding-block: 20px 48px; min-height: calc(100% - 64px); }
+.notice { background: var(--surface); border-left: 4px solid var(--accent); padding: 10px 14px; border-radius: 0 8px 8px 0; margin-bottom: 16px; font-size: 16px; }
+.notice.warn { border-left-color: var(--light-gray); }
+
+/* Home */
+.home { max-width: 1100px; margin-inline: auto; display: grid; gap: 24px; }
+.home-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px; }
+.home-head h2 { font-size: 28px; font-weight: 700; }
+.home-head p { color: var(--fg-muted); max-width: 60ch; }
+.board-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.board-card { display: flex; flex-direction: column; gap: 8px; background: var(--card); border: 1px solid var(--line-soft); border-top: 4px solid var(--accent); border-radius: 10px; padding: 16px; text-decoration: none; box-shadow: var(--shadow); min-height: 150px; }
+.board-card:hover { border-color: var(--line); }
+.board-card h3 { font-size: 18px; font-weight: 700; }
+.board-card .desc { color: var(--fg-muted); font-size: 16px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.board-card .meta { margin-top: auto; display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 14px; color: var(--fg-muted); align-items: center; }
+.chip { display: inline-block; font-family: var(--font-head); font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--fg); }
+.empty { border: 2px dashed var(--line); border-radius: 12px; padding: 36px 24px; text-align: center; display: grid; gap: 10px; justify-items: center; }
+.empty h3 { font-size: 20px; }
+.empty p { color: var(--fg-muted); max-width: 48ch; }
+
+/* Board */
+.board-desc { max-width: 70ch; color: var(--fg-muted); margin-bottom: 18px; font-size: 16px; }
+.board-wrap { display: grid; gap: 20px; }
+.pending-strip { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: grid; gap: 10px; }
+.pending-strip h3 { font-size: 16px; }
+.section-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
+.section-head h3 { font-size: 17px; font-weight: 700; }
+.section-head .count { font-size: 14px; color: var(--fg-muted); }
+.section-block { min-width: 0; }
+
+.wall { columns: 290px; column-gap: 16px; }
+.wall .post { break-inside: avoid; margin-bottom: 16px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; align-items: start; }
+.stream { max-width: 720px; margin-inline: auto; display: grid; gap: 16px; }
+.stream .section-block { width: 100%; }
+.columns { display: flex; gap: 16px; overflow-x: auto; align-items: flex-start; padding-bottom: 12px; scroll-snap-type: x proximity; }
+.columns .section-block { flex: 0 0 300px; max-width: 85vw; background: var(--surface); border-radius: 12px; padding: 12px; display: grid; gap: 12px; align-content: start; scroll-snap-align: start; min-height: 160px; }
+.columns .section-block.over { outline: 3px dashed var(--accent); outline-offset: -4px; }
+.timeline-wrap { position: relative; }
+.timeline { overflow-x: auto; padding-block: 8px 12px; }
+.tl-track { position: relative; display: flex; gap: 24px; min-width: max-content; padding-block: 28px; padding-inline: 8px; align-items: flex-start; }
+.tl-track::before { content: ""; position: absolute; left: 0; right: 0; top: 14px; border-top: 3px dotted var(--line); }
+.tl-track .post { flex: 0 0 280px; position: relative; }
+.tl-track .post::before { content: ""; position: absolute; top: -22px; left: 18px; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg); }
+.tl-nav { display: flex; gap: 8px; justify-content: flex-end; margin-bottom: 6px; }
+.table-wrap { overflow-x: auto; border: 1px solid var(--line-soft); border-radius: 10px; }
+table.posts { border-collapse: collapse; width: 100%; min-width: 760px; font-size: 16px; }
+table.posts th { text-align: left; font-family: var(--font-head); font-size: 13px; letter-spacing: .06em; text-transform: uppercase; background: var(--surface); padding: 10px 12px; border-bottom: 1px solid var(--line); }
+table.posts td { padding: 10px 12px; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+table.posts tr:last-child td { border-bottom: 0; }
+table.posts .cell-body { max-width: 40ch; }
+
+/* Post card */
+.post { --p-bg: var(--post-white); --p-fg: var(--post-white-fg); background: var(--p-bg); color: var(--p-fg); border-radius: 10px; box-shadow: var(--shadow); border: 1px solid var(--line-soft); display: grid; gap: 10px; padding: 14px; min-width: 0; position: relative; }
+.post[data-color="mist"]  { --p-bg: var(--post-mist);  --p-fg: var(--post-mist-fg); }
+.post[data-color="sky"]   { --p-bg: var(--post-sky);   --p-fg: var(--post-sky-fg); }
+.post[data-color="slate"] { --p-bg: var(--post-slate); --p-fg: var(--post-slate-fg); border-color: transparent; }
+.post[data-color="navy"]  { --p-bg: var(--post-navy);  --p-fg: var(--post-navy-fg); border-color: transparent; }
+.post.dragging { opacity: .5; }
+.post.over-before { box-shadow: 0 -4px 0 0 var(--accent), var(--shadow); }
+.post.pending { outline: 2px dashed var(--light-gray); outline-offset: 2px; }
+.post-head { display: flex; align-items: flex-start; gap: 8px; }
+.post-head h4 { font-size: 17px; font-weight: 700; flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.post-body { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 16px; }
+.post-body a { text-decoration: underline; }
+.post img.attach { border-radius: 6px; width: 100%; height: auto; }
+.link-card { display: flex; gap: 10px; align-items: center; border: 1px solid currentColor; border-radius: 8px; padding: 8px 10px; text-decoration: none; font-size: 15px; min-width: 0; opacity: .95; }
+.link-card .host { font-family: var(--font-head); font-weight: 600; font-size: 13px; letter-spacing: .04em; }
+.link-card .url { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.post-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 14px; opacity: .9; }
+.avatar { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; display: inline-block; vertical-align: middle; }
+.post-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.react { display: inline-flex; align-items: center; gap: 4px; border: 1px solid currentColor; background: transparent; border-radius: 999px; padding: 3px 10px; font-size: 14px; font-family: var(--font-head); font-weight: 600; color: inherit; }
+.react[aria-pressed="true"] { background: var(--p-fg); color: var(--p-bg); border-color: var(--p-fg); }
+.post .btn { background: var(--p-fg); color: var(--p-bg); border-color: var(--p-fg); }
+.post .btn.ghost { background: transparent; color: inherit; border-color: currentColor; }
+.post .btn.ghost:hover { background: rgba(127,127,127,.15); }
+.stars { display: inline-flex; gap: 2px; align-items: center; }
+.stars button { background: none; border: 0; padding: 2px; color: inherit; line-height: 1; }
+.stars svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+.stars button[aria-pressed="true"] svg { fill: currentColor; }
+.grade-form { display: inline-flex; gap: 6px; align-items: center; }
+.grade-form input { width: 64px; border: 1px solid currentColor; border-radius: 6px; padding: 3px 6px; background: transparent; color: inherit; }
+.tiny { font-size: 14px; opacity: .9; }
+.comments { border-top: 1px solid currentColor; padding-top: 10px; display: grid; gap: 8px; }
+.comment { display: grid; grid-template-columns: 22px 1fr auto; gap: 8px; align-items: start; font-size: 15px; }
+.comment .who { font-family: var(--font-head); font-weight: 600; font-size: 14px; }
+.comment .when { opacity: .8; font-size: 13px; margin-left: 6px; }
+.comment p { overflow-wrap: anywhere; white-space: pre-wrap; }
+.comment-form { display: grid; gap: 6px; }
+.comment-form textarea { width: 100%; min-height: 60px; border: 1px solid currentColor; border-radius: 8px; padding: 8px; background: transparent; color: inherit; resize: vertical; }
+.menu { position: relative; }
+.menu summary { list-style: none; cursor: pointer; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 6px; color: inherit; }
+.menu summary::-webkit-details-marker { display: none; }
+.menu summary:hover { background: rgba(24,55,96,.08); }
+.post[data-color="navy"] .menu summary:hover { background: rgba(255,255,255,.12); }
+.menu-list { position: absolute; right: 0; top: 32px; z-index: 5; background: var(--card); color: var(--fg); border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); display: grid; min-width: 190px; padding: 6px; }
+.menu-list button { background: none; border: 0; text-align: left; padding: 8px 10px; border-radius: 6px; font-size: 15px; }
+.menu-list button:hover { background: var(--surface); }
+.menu-list hr { border: 0; border-top: 1px solid var(--line-soft); margin: 4px 0; }
+
+/* Dialogs */
+dialog { border: 0; border-radius: 12px; padding: 0; background: var(--card); color: var(--fg); width: min(640px, calc(100vw - 32px)); max-height: calc(100vh - 32px); box-shadow: 0 20px 60px rgba(0,0,0,.35); }
+dialog::backdrop { background: rgba(24,55,96,.55); }
+.dlg-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--line-soft); }
+.dlg-head h2 { font-size: 20px; font-weight: 700; }
+.dlg-body { padding: 16px 20px; display: grid; gap: 14px; max-height: calc(100vh - 180px); overflow-y: auto; }
+.dlg-foot { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; padding: 14px 20px; border-top: 1px solid var(--line-soft); }
+.field { display: grid; gap: 5px; }
+.field label, .field .lbl { font-family: var(--font-head); font-weight: 600; font-size: 14px; }
+.field .help { font-size: 14px; color: var(--fg-muted); }
+.field input[type="text"], .field input[type="url"], .field input[type="number"], .field textarea, .field select { width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 9px 10px; background: var(--bg); color: var(--fg); }
+.field textarea { min-height: 96px; resize: vertical; }
+.row { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
+.check { display: inline-flex; align-items: center; gap: 8px; font-size: 16px; }
+.check input { width: 18px; height: 18px; accent-color: var(--lisle-blue); }
+fieldset { border: 1px solid var(--line-soft); border-radius: 10px; padding: 12px 14px; margin: 0; display: grid; gap: 10px; }
+legend { font-family: var(--font-head); font-weight: 700; font-size: 14px; letter-spacing: .06em; text-transform: uppercase; padding-inline: 6px; }
+.swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+.swatch { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; cursor: pointer; position: relative; }
+.swatch input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.swatch[data-c="white"] { background: var(--post-white); }
+.swatch[data-c="mist"] { background: var(--post-mist); }
+.swatch[data-c="sky"] { background: var(--post-sky); }
+.swatch[data-c="slate"] { background: var(--post-slate); }
+.swatch[data-c="navy"] { background: var(--post-navy); }
+.swatch:has(input:checked) { border-color: var(--fg); box-shadow: 0 0 0 3px var(--accent-soft); }
+.swatch:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 2px; }
+.templates { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
+.tpl { position: relative; border: 1px solid var(--line); border-radius: 10px; padding: 12px; display: grid; gap: 4px; cursor: pointer; background: var(--bg); }
+.tpl input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.tpl:has(input:checked) { border-color: var(--fg); box-shadow: 0 0 0 3px var(--accent-soft); }
+.tpl:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 2px; }
+.tpl b { font-family: var(--font-head); font-weight: 700; font-size: 15px; }
+.tpl span { font-size: 14px; color: var(--fg-muted); }
+.sec-list { display: grid; gap: 6px; }
+.sec-row { display: flex; gap: 6px; align-items: center; }
+.sec-row input { flex: 1 1 auto; min-width: 0; border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; background: var(--bg); color: var(--fg); }
+.img-preview { max-height: 180px; width: auto; border-radius: 8px; border: 1px solid var(--line-soft); }
+.err { color: var(--fg); background: var(--surface); border-left: 4px solid var(--light-gray); padding: 8px 10px; border-radius: 0 6px 6px 0; font-size: 15px; }
+
+/* Skip link, board title block, pins, filter count, export menu */
+.skip { position: absolute; left: 16px; top: -200px; z-index: 40; background: #FFFFFF; color: var(--lisle-blue); padding: 8px 14px; border-radius: 8px; font-family: var(--font-head); font-weight: 600; text-decoration: none; box-shadow: var(--shadow); }
+.skip:focus { top: 8px; outline: 3px solid var(--light-blue); }
+.filter-wrap { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.filter-count { font-family: var(--font-head); font-size: 13px; font-weight: 600; color: var(--light-blue); white-space: nowrap; }
+.filter-count:empty { display: none; }
+.tool-menu summary { width: auto; height: auto; display: inline-flex; }
+.tool-menu .menu-list { top: 42px; }
+.board-head { display: grid; gap: 8px; max-width: 76ch; margin-bottom: 20px; }
+.board-head h1 { font-size: 26px; font-weight: 700; overflow-wrap: anywhere; }
+.board-head .board-desc { margin-bottom: 0; }
+.board-meta { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; font-size: 14px; color: var(--fg-muted); }
+.post.pinned { border-color: var(--accent); }
+.post[data-color="navy"].pinned { border-color: var(--light-blue); }
+.pin-flag { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-head); font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+.pin-flag .icon { width: 14px; height: 14px; }
+.print-only { display: none; }
+
+/* Slideshow */
+dialog.slides { width: min(1200px, calc(100vw - 24px)); height: calc(100vh - 24px); max-height: none; background: var(--lisle-blue); color: #FFFFFF; }
+.slide-stage { display: grid; grid-template-rows: auto 1fr auto; height: 100%; }
+.slide-top, .slide-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; }
+.slide-top h2 { font-size: 16px; font-weight: 600; color: var(--light-blue); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.slide-foot { justify-content: center; }
+.slide-counter { font-family: var(--font-head); font-weight: 600; font-size: 15px; min-width: 8ch; text-align: center; }
+.slide-body { display: grid; place-items: center; padding: 8px 24px; overflow: auto; min-height: 0; }
+.slide-card { width: min(860px, 100%); font-size: 21px; padding: 28px 32px; gap: 16px; border: 0; }
+.slide-card h3 { font-size: 32px; font-weight: 700; overflow-wrap: anywhere; }
+.slide-card .post-body { font-size: 21px; }
+.slide-card img.attach { max-height: 48vh; width: auto; max-width: 100%; margin-inline: auto; }
+.slide-card .post-meta { font-size: 16px; }
+.slide-section { font-family: var(--font-head); font-size: 13px; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; opacity: .85; }
+.slides .btn { background: #FFFFFF; color: var(--lisle-blue); border-color: #FFFFFF; }
+.slides .btn.ghost { background: transparent; color: #FFFFFF; border-color: var(--light-blue); }
+.slides .btn.ghost:hover { background: rgba(255,255,255,.12); }
+.slides :focus-visible { outline-color: var(--light-blue); }
+.slide-empty { text-align: center; font-size: 20px; }
+
+/* QR code */
+.qr-box { display: grid; justify-items: center; gap: 12px; text-align: center; }
+.qr-box svg { width: min(320px, 70vw); height: auto; }
+.qr-box .url { font-size: 15px; overflow-wrap: anywhere; color: var(--fg-muted); }
+
+/* Print */
+@media print {
+  .top, footer.site, dialog, #toast, .menu, .post-foot, .tl-nav, .skip, .pending-strip, .notice, .comment-form, .filter-wrap { display: none !important; }
+  .print-only { display: block; }
+  html, body { height: auto; background: #FFFFFF; color: #183760; font-size: 12pt; }
+  main { padding: 0; min-height: 0; }
+  .board-head { max-width: none; }
+  .board-head h1 { font-size: 20pt; }
+  .columns { display: block; overflow: visible; padding: 0; }
+  .columns .section-block { max-width: none; background: none; padding: 0; margin-bottom: 14pt; }
+  .section-block, .post, tr { break-inside: avoid; }
+  .wall { columns: 2; column-gap: 14pt; }
+  .grid { grid-template-columns: repeat(2, 1fr); }
+  .stream { max-width: none; }
+  .timeline { overflow: visible; }
+  .tl-track { flex-wrap: wrap; min-width: 0; padding-block: 0; gap: 14pt; }
+  .tl-track::before, .tl-track .post::before { display: none; }
+  .tl-track .post { flex: 1 1 45%; }
+  .post { box-shadow: none; border: 1px solid #999B9E; background: #FFFFFF !important; color: #183760 !important; }
+  .post .link-card .url { white-space: normal; }
+  .comments { border-top-color: #999B9E; }
+  table.posts { min-width: 0; font-size: 11pt; }
+  .table-wrap { overflow: visible; border-color: #999B9E; }
+  a { text-decoration: none; }
+}
+
+/* Toast */
+#toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--lisle-blue); color: #FFFFFF; padding: 10px 16px; border-radius: 8px; font-family: var(--font-head); font-weight: 600; font-size: 15px; box-shadow: var(--shadow); z-index: 50; max-width: calc(100vw - 32px); }
+footer.site { padding: 12px 16px 24px; font-size: 14px; color: var(--fg-muted); text-align: center; }
+
+@media (max-width: 640px) {
+  .top { padding-block: 8px; }
+  .wordmark { font-size: 19px; }
+  .toolbar { width: 100%; margin-left: 0; }
+  .top input[type="search"] { width: 100%; flex: 1 1 100%; }
+  .columns .section-block { flex-basis: 85vw; }
+  .home-head h2 { font-size: 24px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .post, .board-card { transition: box-shadow .15s ease, border-color .15s ease; }
+}
+</style>
+<style>
+html { color-scheme: light; }
+.who { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #FFFFFF; }
+.who .avatar { width: 26px; height: 26px; }
+#dlg-signin .intro { color: var(--fg-muted); font-size: 16px; }
+</style>
+</head>
+<body>
+<a class="skip" href="#app" id="skip">Skip to content</a>
+<header class="top">
+  <div class="brand">
+    <span class="eyebrow">Lisle CUSD 202</span>
+    <a class="wordmark" href="#" id="home-link">Lisle Boards</a>
+  </div>
+  <div class="crumb" id="crumb" hidden>
+    <p class="crumb-title" id="crumb-title"></p>
+    <span class="fmt" id="crumb-fmt"></span>
+  </div>
+  <div class="toolbar" id="toolbar"></div>
+  <div class="who" id="who" hidden></div>
+</header>
+
+<main id="app" aria-live="polite"></main>
+<footer class="site" id="site-foot">Lisle Boards is an internal tool for Lisle CUSD 202 staff. Do not post student names or other identifying details.</footer>
+
+<dialog id="dlg-board" aria-labelledby="dlg-board-title">
+  <form method="dialog" id="form-board">
+    <div class="dlg-head"><h2 id="dlg-board-title">New board</h2><button type="button" class="btn ghost sm" data-close>Close</button></div>
+    <div class="dlg-body">
+      <div id="tpl-wrap" class="field">
+        <span class="lbl">Start from</span>
+        <div class="templates" id="templates"></div>
+      </div>
+      <div class="field"><label for="b-title">Title</label><input type="text" id="b-title" maxlength="120" required></div>
+      <div class="field"><label for="b-desc">Description</label><textarea id="b-desc" maxlength="1000" placeholder="What should people post here? Example: Share one strategy from this week that moved a group of students forward."></textarea></div>
+      <fieldset>
+        <legend>Layout</legend>
+        <div class="field"><label for="b-format">Format</label>
+          <select id="b-format">
+            <option value="wall">Wall: compact brick layout</option>
+            <option value="columns">Columns: posts stacked under headings</option>
+            <option value="grid">Grid: rows of equal boxes</option>
+            <option value="stream">Stream: one column, top to bottom</option>
+            <option value="timeline">Timeline: left to right with a connecting line</option>
+            <option value="table">Table: one row per post</option>
+          </select>
+        </div>
+        <label class="check"><input type="checkbox" id="b-usesections"> Group posts by section</label>
+        <div class="field" id="sections-field">
+          <span class="lbl">Sections</span>
+          <div class="sec-list" id="sec-list"></div>
+          <div><button type="button" class="btn ghost sm" id="sec-add">Add section</button></div>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Posting</legend>
+        <div class="row">
+          <label class="check"><input type="checkbox" id="b-reqsubject"> Require a subject</label>
+          <label class="check"><input type="checkbox" id="b-reqbody"> Require a body</label>
+        </div>
+        <div class="row">
+          <label class="check"><input type="checkbox" id="b-showauthor" checked> Show author</label>
+          <label class="check"><input type="checkbox" id="b-showtime" checked> Show timestamp</label>
+        </div>
+        <div class="field"><label for="b-newpos">New posts appear</label>
+          <select id="b-newpos"><option value="top">First</option><option value="bottom">Last</option></select>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Engagement</legend>
+        <label class="check"><input type="checkbox" id="b-comments" checked> Allow comments (comments always show the author)</label>
+        <div class="field"><label for="b-reactions">Reactions</label>
+          <select id="b-reactions">
+            <option value="none">None</option>
+            <option value="like">Like</option>
+            <option value="vote">Vote (up or down)</option>
+            <option value="star">Star (1 to 5)</option>
+            <option value="grade">Grade (number, moderators only)</option>
+          </select>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Moderation</legend>
+        <label class="check"><input type="checkbox" id="b-approval"> Require approval before posts appear</label>
+        <div id="b-frozen-wrap"><label class="check"><input type="checkbox" id="b-frozen"> Freeze this board (read-only)</label>
+        <p class="help">While a board is frozen, no one can post, react, or comment. Moderators can still edit, pin, approve, or delete posts, and can unfreeze the board here.</p></div>
+        <p class="help">The board owner and Lisle Boards editors can approve or remove posts. Comments are not held for approval.</p>
+      </fieldset>
+      <div id="b-danger" hidden>
+        <button type="button" class="btn danger sm" id="b-delete">Delete this board and all its posts</button>
+      </div>
+      <p class="err" id="b-err" hidden></p>
+    </div>
+    <div class="dlg-foot"><button type="button" class="btn ghost" data-close>Cancel</button><button type="submit" class="btn" id="b-save">Create board</button></div>
+  </form>
+</dialog>
+
+<dialog id="dlg-post" aria-labelledby="dlg-post-title">
+  <form method="dialog" id="form-post">
+    <div class="dlg-head"><h2 id="dlg-post-title">New post</h2><button type="button" class="btn ghost sm" data-close>Close</button></div>
+    <div class="dlg-body">
+      <div class="field"><label for="p-subject">Subject</label><input type="text" id="p-subject" maxlength="200"></div>
+      <div class="field"><label for="p-body">Body</label><textarea id="p-body" maxlength="5000"></textarea><span class="help">Describe students only in aggregate (for example, "about a third of the class"). Never post a student's name.</span></div>
+      <div class="field"><label for="p-link">Link</label><input type="url" id="p-link" placeholder="https://"></div>
+      <div class="field" id="p-image-field">
+        <label for="p-image">Image</label>
+        <input type="file" id="p-image" accept="image/png,image/jpeg,image/gif,image/webp">
+        <img id="p-image-preview" class="img-preview" alt="" hidden>
+        <div class="row"><button type="button" class="btn ghost sm" id="p-image-remove" hidden>Remove image</button></div>
+        <label for="p-alt">Image description (alt text)</label><input type="text" id="p-alt" maxlength="200" placeholder="Describe what the image shows">
+      </div>
+      <div class="field" id="p-section-field"><label for="p-section">Section</label><select id="p-section"></select></div>
+      <div class="field"><span class="lbl">Card color</span>
+        <div class="swatches" id="swatches">
+          <label class="swatch" data-c="white"><input type="radio" name="color" value="white" checked><span class="sr-only">White</span></label>
+          <label class="swatch" data-c="mist"><input type="radio" name="color" value="mist"><span class="sr-only">Mist</span></label>
+          <label class="swatch" data-c="sky"><input type="radio" name="color" value="sky"><span class="sr-only">Sky</span></label>
+          <label class="swatch" data-c="slate"><input type="radio" name="color" value="slate"><span class="sr-only">Slate</span></label>
+          <label class="swatch" data-c="navy"><input type="radio" name="color" value="navy"><span class="sr-only">Lisle Blue</span></label>
+        </div>
+      </div>
+      <p class="err" id="p-err" hidden></p>
+    </div>
+    <div class="dlg-foot"><button type="button" class="btn ghost" data-close>Cancel</button><button type="submit" class="btn" id="p-save">Post</button></div>
+  </form>
+</dialog>
+
+<dialog id="dlg-confirm" aria-labelledby="dlg-confirm-title">
+  <div class="dlg-head"><h2 id="dlg-confirm-title">Are you sure?</h2></div>
+  <div class="dlg-body"><p id="dlg-confirm-msg"></p></div>
+  <div class="dlg-foot"><button type="button" class="btn ghost" id="confirm-no">Cancel</button><button type="button" class="btn" id="confirm-yes">Confirm</button></div>
+</dialog>
+
+
+<dialog id="dlg-slides" class="slides" aria-labelledby="slides-title">
+  <div class="slide-stage">
+    <div class="slide-top"><h2 id="slides-title">Slideshow</h2><button type="button" class="btn ghost sm" data-close>Close</button></div>
+    <div class="slide-body" id="slide-body"></div>
+    <div class="slide-foot">
+      <button type="button" class="btn ghost" id="slide-prev">Previous</button>
+      <span class="slide-counter" id="slide-counter" role="status"></span>
+      <button type="button" class="btn ghost" id="slide-next">Next</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="dlg-qr" aria-labelledby="dlg-qr-title">
+  <div class="dlg-head"><h2 id="dlg-qr-title">QR code for this board</h2><button type="button" class="btn ghost sm" data-close>Close</button></div>
+  <div class="dlg-body"><div class="qr-box" id="qr-box"></div></div>
+  <div class="dlg-foot"><button type="button" class="btn ghost" id="qr-download">Download SVG</button><button type="button" class="btn" data-close>Done</button></div>
+</dialog>
+
+<div id="toast" hidden role="status"></div>
+
+<dialog id="dlg-signin" aria-labelledby="dlg-signin-title">
+  <form id="form-signin">
+    <div class="dlg-head"><h2 id="dlg-signin-title">Sign in to Lisle Boards</h2></div>
+    <div class="dlg-body">
+      <p class="intro">This is a pilot for Lisle 202 staff. Use the access code from the pilot email. Your name appears on what you post.</p>
+      <div class="field"><label for="s-code">Access code</label><input type="text" id="s-code" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="80" required></div>
+      <div class="field"><label for="s-name">Your name</label><input type="text" id="s-name" autocomplete="name" maxlength="60" required placeholder="As colleagues know you"></div>
+      <div class="field"><label for="s-admin">Moderator code (optional)</label><input type="text" id="s-admin" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="80"><span class="help">Only for the people running the pilot. Leave blank otherwise.</span></div>
+      <p class="err" id="s-err" hidden></p>
+    </div>
+    <div class="dlg-foot"><button type="submit" class="btn" id="s-go">Sign in</button></div>
+  </form>
+</dialog>
+<script>
+(function () {
+  "use strict";
+
+  const FORMATS = { wall: "Wall", columns: "Columns", grid: "Grid", stream: "Stream", timeline: "Timeline", table: "Table" };
+  const GAP = 65536; // spacing between neighboring sortIndex values
+  const TEMPLATES = [
+    { id: "blank", name: "Blank wall", desc: "Open brick layout, no sections.", format: "wall", useSections: false, sections: [], reactions: "like", comments: true, requireSubject: false, requireBody: false, requireApproval: false, newPostPos: "top" },
+    { id: "exit", name: "Exit ticket", desc: "One column. Each post answers one prompt.", format: "stream", useSections: false, sections: [], reactions: "none", comments: false, requireSubject: false, requireBody: true, requireApproval: false, newPostPos: "bottom", description: "Before you leave: what is one thing you tried this week, and what did you notice?" },
+    { id: "parking", name: "Parking lot", desc: "Questions, ideas, and follow-ups in columns.", format: "columns", useSections: true, sections: ["Questions", "Ideas", "Follow-ups"], reactions: "vote", comments: true, requireSubject: true, requireBody: false, requireApproval: false, newPostPos: "bottom" },
+    { id: "kwl", name: "K-W-L chart", desc: "Know, Want to know, Learned.", format: "columns", useSections: true, sections: ["Know", "Want to know", "Learned"], reactions: "none", comments: false, requireSubject: false, requireBody: true, requireApproval: false, newPostPos: "bottom" },
+    { id: "gallery", name: "Gallery walk", desc: "Grid of work with likes and comments.", format: "grid", useSections: false, sections: [], reactions: "like", comments: true, requireSubject: true, requireBody: false, requireApproval: true, newPostPos: "bottom" },
+    { id: "unit", name: "Unit timeline", desc: "Lessons or events left to right.", format: "timeline", useSections: false, sections: [], reactions: "none", comments: true, requireSubject: true, requireBody: false, requireApproval: false, newPostPos: "bottom" },
+    { id: "resources", name: "Resource table", desc: "One row per link with notes.", format: "table", useSections: true, sections: ["Reading", "Tools", "Planning"], reactions: "star", comments: false, requireSubject: true, requireBody: false, requireApproval: false, newPostPos: "bottom" }
+  ];
+  const AUTH_KEY = "lisleBoardsAuth", UID_KEY = "lisleBoardsUid";
+  const POLL_MS = 6000;
+
+  const S = {
+    auth: null, ready: false, me: null, isAdmin: false, users: {},
+    route: { view: "home", bid: null }, boards: [], board: undefined, posts: [], unsubs: [],
+    filter: "", openComments: new Set(), drafts: {}, renderToken: 0, lastShown: [], lastCtx: null, postsLoaded: false, slides: null, slideIdx: 0, migratedFor: null, qrSvg: null, editingPost: null, editingBoard: null, pendingImage: null, removeImage: false, confirmResolve: null
+  };
+
+  const $ = (sel, root) => (root || document).querySelector(sel);
+  const $$ = (sel, root) => Array.from((root || document).querySelectorAll(sel));
+  function h(tag, attrs, ...kids) {
+    const el = document.createElement(tag);
+    if (attrs) for (const [k, v] of Object.entries(attrs)) {
+      if (v == null || v === false) continue;
+      if (k === "class") el.className = v;
+      else if (k === "text") el.textContent = v;
+      else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+      else if (k === "dataset") Object.assign(el.dataset, v);
+      else el.setAttribute(k, v === true ? "" : v);
+    }
+    for (const kid of kids.flat()) if (kid != null && kid !== false) el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
+    return el;
+  }
+  const svg = (d) => { const s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("viewBox", "0 0 24 24"); s.setAttribute("class", "icon"); s.setAttribute("aria-hidden", "true"); s.innerHTML = d; return s; };
+  const ICON = {
+    plus: '<path d="M12 5v14M5 12h14"/>',
+    gear: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+    link: '<path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>',
+    download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/>',
+    dots: '<circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/>',
+    left: '<path d="M15 18l-6-6 6-6"/>', right: '<path d="M9 18l6-6-6-6"/>',
+    thumb: '<path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.3a2 2 0 0 0 2-1.7l1.4-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>',
+    up: '<path d="M12 19V5M5 12l7-7 7 7"/>', down: '<path d="M12 5v14M19 12l-7 7-7-7"/>',
+    comment: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+    star: '<polygon points="12 2 15.1 8.3 22 9.3 17 14.1 18.2 21 12 17.8 5.8 21 7 14.1 2 9.3 8.9 8.3 12 2"/>',
+    play: '<polygon points="6 4 20 12 6 20 6 4"/>',
+    pin: '<path d="M12 22v-6"/><path d="M8 3h8v4l2 7H6l2-7z"/>'
+  };
+
+  const rid = (p) => p + Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+  const fmtTime = (ts) => { try { return new Date(ts).toLocaleString(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }); } catch (e) { return ""; } };
+  let toastTimer = null;
+  function toast(msg) { const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 3200); }
+  function confirmDialog(title, msg, yes) {
+    return new Promise((resolve) => {
+      $("#dlg-confirm-title").textContent = title; $("#dlg-confirm-msg").textContent = msg; $("#confirm-yes").textContent = yes || "Confirm";
+      S.confirmResolve = resolve; $("#dlg-confirm").showModal();
+    });
+  }
+  $("#confirm-yes").addEventListener("click", () => { $("#dlg-confirm").close(); S.confirmResolve && S.confirmResolve(true); });
+  $("#confirm-no").addEventListener("click", () => { $("#dlg-confirm").close(); S.confirmResolve && S.confirmResolve(false); });
+  $("#dlg-confirm").addEventListener("cancel", () => { S.confirmResolve && S.confirmResolve(false); });
+  $$("[data-close]").forEach(b => b.addEventListener("click", () => b.closest("dialog").close()));
+
+  function linkify(text) {
+    const frag = document.createDocumentFragment();
+    const re = /https?:\/\/[^\s<>"']+/g; let last = 0, m;
+    while ((m = re.exec(text))) {
+      if (m.index > last) frag.append(text.slice(last, m.index));
+      frag.append(h("a", { href: m[0], target: "_blank", rel: "noopener noreferrer", text: m[0] }));
+      last = m.index + m[0].length;
+    }
+    if (last < text.length) frag.append(text.slice(last));
+    return frag;
+  }
+  function hostOf(url) { try { return new URL(url).hostname.replace(/^www\./, ""); } catch (e) { return url; } }
+  const imgUrl = (id) => "/api/image?id=" + encodeURIComponent(id);
+
+  // ---------- API ----------
+  async function api(method, params, body) {
+    const headers = { "content-type": "application/json" };
+    if (S.auth) { headers["x-access"] = S.auth.code; headers["x-admin"] = S.auth.admin || ""; headers["x-user"] = S.auth.uid; }
+    let res;
+    try { res = await fetch("/api/data" + (params ? "?" + new URLSearchParams(params) : ""), { method, headers, body: body ? JSON.stringify(body) : undefined, cache: "no-store" }); }
+    catch (e) { throw { code: "network", message: "No connection. Check your network and try again." }; }
+    let data = null; try { data = await res.json(); } catch (e) {}
+    if (!res.ok) throw { code: res.status === 401 ? "unauthorized" : res.status === 403 ? "forbidden" : res.status === 413 ? "too_large" : "server", status: res.status, message: (data && data.error) || ("Request failed (" + res.status + ")") };
+    return data;
+  }
+  function writeError(e) {
+    console.error(e);
+    if (e && e.code === "unauthorized") { toast("Your access code no longer works. Sign in again."); signOut(); return; }
+    toast((e && e.message) || "That change did not save. Try again.");
+  }
+
+  const pollers = new Map();
+  function subscribe(path, fn) {
+    let p = pollers.get(path);
+    if (!p) { p = { v: "", data: null, fns: new Set(), timer: null, busy: false, again: false }; pollers.set(path, p); schedule(p, path, 0); }
+    p.fns.add(fn); if (p.data) fn(p.data);
+    return () => { p.fns.delete(fn); if (!p.fns.size) { clearTimeout(p.timer); pollers.delete(path); } };
+  }
+  function schedule(p, path, ms) { clearTimeout(p.timer); p.timer = setTimeout(() => pull(path), ms); }
+  async function pull(path, force) {
+    const p = pollers.get(path); if (!p || !S.ready) return;
+    if (p.busy) { p.again = p.again || !!force; return; }
+    p.busy = true;
+    try {
+      const r = await api("GET", { path, v: force ? "" : p.v });
+      if (!r.unchanged) { p.v = r.v; p.data = r; if (r.users) Object.assign(S.users, r.users); p.fns.forEach(fn => fn(r)); }
+    } catch (e) {
+      if (e.code === "unauthorized") { signOut(); return; }
+      if (e.status === 400 || e.status === 404) { p.data = { v: "", board: null, posts: [], boards: [] }; p.fns.forEach(fn => fn(p.data)); }
+      console.warn(e);
+    } finally {
+      p.busy = false;
+      if (pollers.get(path) === p) { schedule(p, path, document.visibilityState === "visible" ? POLL_MS : POLL_MS * 5); if (p.again) { p.again = false; pull(path, true); } }
+    }
+  }
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") pollers.forEach((p, path) => pull(path, true)); });
+  function refresh(path) { const bid = path.split("/")[1]; pull("boards", true); if (bid) pull("boards/" + bid, true); }
+  async function write(op, path, extra) { const r = await api("POST", null, Object.assign({ op, path }, extra || {})); refresh(path); return r; }
+
+  // ---------- People ----------
+  const AV_COLORS = ["#183760", "#465F80", "#2F4D73", "#74879F"];
+  function hashStr(s) { let x = 0; for (const ch of s) x = (x * 31 + ch.charCodeAt(0)) >>> 0; return x; }
+  function avatarFor(name, id) {
+    const c = AV_COLORS[hashStr(id || "") % AV_COLORS.length];
+    const initials = (name || "?").trim().split(/\s+/).slice(0, 2).map(w => w[0] || "").join("").toUpperCase() || "?";
+    return "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="' + c + '"/><text x="20" y="25" font-size="16" font-family="Montserrat, Calibri, sans-serif" font-weight="700" text-anchor="middle" fill="#FFFFFF">' + initials.replace(/[<>&]/g, "") + '</text></svg>');
+  }
+  function profiles(ids) { const out = {}; for (const id of ids) { const u = S.users[id]; const name = u && u.name ? u.name : ""; out[id] = { id, name, avatarUrl: avatarFor(name, id), isMe: id === S.me }; } return out; }
+
+  // ---------- Images ----------
+  function loadImage(file) { return new Promise((res, rej) => { const url = URL.createObjectURL(file); const im = new Image(); im.onload = () => { URL.revokeObjectURL(url); res(im); }; im.onerror = () => { URL.revokeObjectURL(url); rej(new Error("bad image")); }; im.src = url; }); }
+  function readDataUrl(file) { return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(file); }); }
+  async function compressImage(file) {
+    const MAX = 900000;
+    if (file.type === "image/gif") { const d = await readDataUrl(file); if (d.length > MAX) throw { code: "too_large", message: "GIFs must be under 650 KB." }; return d; }
+    if (file.size < 450000 && /^image\/(png|webp|jpeg)$/.test(file.type)) { const d = await readDataUrl(file); if (d.length <= MAX) return d; }
+    const im = await loadImage(file);
+    let w = im.naturalWidth, hh = im.naturalHeight, maxDim = 1600;
+    for (let attempt = 0; attempt < 6; attempt++) {
+      const scale = Math.min(1, maxDim / Math.max(w, hh)); const cw = Math.max(1, Math.round(w * scale)), ch = Math.max(1, Math.round(hh * scale));
+      const c = document.createElement("canvas"); c.width = cw; c.height = ch; const ctx = c.getContext("2d"); ctx.fillStyle = "#FFFFFF"; ctx.fillRect(0, 0, cw, ch); ctx.drawImage(im, 0, 0, cw, ch);
+      for (const q of [0.85, 0.75, 0.65, 0.55]) { const d = c.toDataURL("image/jpeg", q); if (d.length <= MAX) return d; }
+      maxDim = Math.round(maxDim * 0.7);
+    }
+    throw { code: "too_large", message: "That image could not be made small enough. Try a smaller one." };
+  }
+  async function uploadImage(file) { const data = await compressImage(file); const r = await api("POST", null, { op: "image", data }); return r.id; }
+  async function deleteImage(id) { try { await api("POST", null, { op: "deleteImage", id }); } catch (e) { console.warn(e); } }
+
+  // ---------- Auth ----------
+  function loadAuth() { try { const a = JSON.parse(localStorage.getItem(AUTH_KEY) || "null"); return a && a.code && a.uid && a.name ? a : null; } catch (e) { return null; } }
+  function saveAuth(a) { try { localStorage.setItem(AUTH_KEY, JSON.stringify(a)); localStorage.setItem(UID_KEY, JSON.stringify({ uid: a.uid, name: a.name })); } catch (e) {} }
+  // The same person on the same browser keeps one id across sign-ins; a different name gets a fresh id,
+  // so a colleague using a shared computer does not inherit someone else's posts.
+  function deviceUid(name) {
+    let saved = null; try { saved = JSON.parse(localStorage.getItem(UID_KEY) || "null"); } catch (e) {}
+    const same = saved && /^u[a-z0-9]{6,24}$/.test(saved.uid || "") && (saved.name || "").trim().toLowerCase() === (name || "").trim().toLowerCase();
+    return same ? saved.uid : rid("u");
+  }
+  function showSignIn(prefill) {
+    const d = $("#dlg-signin"); $("#s-err").hidden = true;
+    if (prefill) { $("#s-code").value = prefill.code || ""; $("#s-name").value = prefill.name || ""; $("#s-admin").value = prefill.admin || ""; }
+    if (!d.open) d.showModal(); setTimeout(() => ($("#s-code").value ? $("#s-name") : $("#s-code")).focus(), 30);
+  }
+  $("#dlg-signin").addEventListener("cancel", (e) => e.preventDefault());
+  $("#form-signin").addEventListener("submit", async (e) => {
+    e.preventDefault(); const err = $("#s-err"); err.hidden = true;
+    const code = $("#s-code").value.trim(), name = $("#s-name").value.trim(), admin = $("#s-admin").value.trim();
+    if (!code) { err.textContent = "Enter the access code."; err.hidden = false; return; }
+    if (!name) { err.textContent = "Enter your name so colleagues know who posted."; err.hidden = false; return; }
+    const btn = $("#s-go"); btn.disabled = true;
+    const auth = { code, admin, uid: deviceUid(name), name };
+    S.auth = auth;
+    try {
+      const r = await api("POST", null, { op: "hello", name });
+      if (admin && !r.admin) { err.textContent = "The moderator code is not right. Leave it blank to sign in without it."; err.hidden = false; S.auth = null; return; }
+      saveAuth(auth); S.me = auth.uid; S.isAdmin = !!r.admin; S.ready = true; S.users[auth.uid] = { name };
+      $("#dlg-signin").close(); updateWho(); onRoute();
+    } catch (x) { S.auth = null; err.textContent = x.message || "Could not sign in."; err.hidden = false; }
+    finally { btn.disabled = false; }
+  });
+  function signOut() { const prev = S.auth; S.auth = null; S.ready = false; S.me = null; S.isAdmin = false; clearSubs(); try { localStorage.removeItem(AUTH_KEY); } catch (e) {} updateWho(); render(); showSignIn(prev ? { code: prev.code, name: prev.name } : null); }
+  function updateWho() {
+    const w = $("#who"); if (!S.ready) { w.hidden = true; w.replaceChildren(); return; }
+    w.hidden = false; w.replaceChildren(h("img", { class: "avatar", src: avatarFor(S.auth.name, S.me), alt: "" }), h("span", { text: S.auth.name + (S.isAdmin ? " (moderator)" : "") }), h("button", { class: "btn ghost sm", onclick: signOut, text: "Switch" }));
+  }
+
+  // ---------- Routing ----------
+  function routeFromHash() { const t = (location.hash || "").replace(/^#/, ""); return /^x[a-z0-9]+$/.test(t) ? { view: "board", bid: t } : { view: "home", bid: null }; }
+  function go(hash) { if (location.hash !== hash) location.hash = hash; else onRoute(); }
+  window.addEventListener("hashchange", onRoute);
+  $("#home-link").addEventListener("click", (e) => { e.preventDefault(); go("#"); });
+  $("#skip").addEventListener("click", (e) => { e.preventDefault(); const t = $("#board-body") || $("#app"); t.setAttribute("tabindex", "-1"); t.focus(); t.scrollIntoView(); });
+  function clearSubs() { S.unsubs.forEach(u => { try { u(); } catch (e) {} }); S.unsubs = []; }
+  function onRoute() {
+    S.route = routeFromHash(); clearSubs(); S.filter = ""; S.openComments = new Set();
+    if (!S.ready) { render(); return; }
+    if (S.route.view === "home") S.unsubs.push(subscribe("boards", (r) => { S.boards = r.boards || []; render(); }));
+    else { S.board = undefined; S.posts = []; S.postsLoaded = false; S.unsubs.push(subscribe("boards/" + S.route.bid, (r) => { S.board = r.board ? Object.assign({ id: S.route.bid }, r.board) : null; S.posts = (r.posts || []).map(p => normalizePost(p.id, p)); S.postsLoaded = true; render(); })); }
+    render();
+  }
+
+  function isModerator(board) { return S.isAdmin || (board && S.me && board.ownerId === S.me); }
+  function isFrozen(b) { return !!(b && b.frozen); }
+  function canContribute(b) { return mayPost() && !isFrozen(b); }
+  function canManage(b, p) { if (!mayPost()) return false; const mod = isModerator(b); if (isFrozen(b)) return mod; return mod || (!!p && p.authorId === S.me); }
+  function normalizePost(id, d) { const p = Object.assign({ id }, d || {}); if (p.sectionId === undefined) p.sectionId = null; if (!p.color) p.color = "white"; if (!p.reactions || typeof p.reactions !== "object") p.reactions = {}; if (!Array.isArray(p.comments)) p.comments = []; if (p.pinnedAt == null) p.pinnedAt = null; return p; }
+  const writePost = (pid, patch) => write("update", "boards/" + S.board.id + "/posts/" + pid, { data: patch });
+  const writeBoard = (bid, patch) => write("update", "boards/" + bid, { data: patch });
+  const imgSrc = (id) => imgUrl(id);
+  function getProfiles(ids) { return profiles(ids); }
+  function saveText(filename, data, type, okMsg) { saveFile(filename, data, type); toast(okMsg); }
+  function mayPost() { return S.ready; }
+
+  // ---------- Render ----------
+  async function render() {
+    const token = ++S.renderToken;
+    const app = $("#app"); const toolbar = $("#toolbar"); const crumb = $("#crumb"); const skip = $("#skip");
+    if (S.route.view === "home") {
+      crumb.hidden = true; document.title = "Lisle Boards"; if (skip) skip.textContent = "Skip to boards";
+      toolbar.replaceChildren(mayPost() ? h("button", { class: "btn", onclick: () => openBoardDialog(null) }, svg(ICON.plus), "New board") : "");
+      app.replaceChildren(await renderHome());
+      return;
+    }
+    const b = S.board;
+    crumb.hidden = false; if (skip) skip.textContent = "Skip to posts";
+    if (!S.ready) { $("#crumb-title").textContent = "Sign in"; $("#crumb-fmt").textContent = ""; toolbar.replaceChildren(); app.replaceChildren(signInNotice()); return; }
+    if (b === undefined) { $("#crumb-title").textContent = "Loading"; $("#crumb-fmt").textContent = ""; toolbar.replaceChildren(); app.replaceChildren(h("p", { class: "notice", text: "Loading board." })); return; }
+    if (b === null) { $("#crumb-title").textContent = "Board not found"; $("#crumb-fmt").textContent = ""; toolbar.replaceChildren(); app.replaceChildren(h("div", { class: "empty" }, h("h3", { text: "This board does not exist or was deleted." }), h("a", { class: "btn", href: "#", text: "Back to all boards" }))); return; }
+    $("#crumb-title").textContent = b.title; $("#crumb-fmt").textContent = FORMATS[b.format] || "";
+    document.title = b.title + " | Lisle Boards";
+    const search = h("input", { type: "search", id: "filter", placeholder: "Search posts", "aria-label": "Search posts on this board", value: S.filter, oninput: (e) => { S.filter = e.target.value; renderBoardBody(); } });
+    const tools = [h("span", { class: "filter-wrap" }, search, h("span", { id: "filter-count", class: "filter-count", role: "status" })),
+      h("button", { class: "btn ghost", onclick: copyBoardLink, title: "Copy a link to this board" }, svg(ICON.link), "Copy link"),
+      exportMenu(),
+      h("button", { class: "btn ghost", onclick: () => openSlides(0), title: "Show one post at a time, full width" }, svg(ICON.play), "Slideshow")];
+    if (isModerator(b) && mayPost()) tools.push(h("button", { class: "btn ghost", onclick: () => openBoardDialog(b) }, svg(ICON.gear), "Settings"));
+    if (canContribute(b)) tools.push(h("button", { class: "btn", onclick: () => openPostDialog(null) }, svg(ICON.plus), "New post"));
+    toolbar.replaceChildren(...tools);
+    const wrap = h("div", { class: "board-wrap" });
+    wrap.append(h("div", { class: "board-head" }, h("h1", { text: b.title }), b.description ? h("p", { class: "board-desc" }, linkify(b.description)) : "", h("div", { class: "board-meta", id: "board-meta" }),
+      h("p", { class: "print-only tiny", text: "Lisle Boards. " + boardLink() + ". Printed " + fmtTime(Date.now()) + "." })));
+    if (isFrozen(b)) wrap.append(h("p", { class: "notice", text: "This board is frozen, so it is read-only. A moderator can unfreeze it in Settings." }));
+    
+    wrap.append(h("div", { id: "board-body" }));
+    app.replaceChildren(wrap);
+    if (token !== S.renderToken) return;
+    await renderBoardBody();
+  }
+  function signInNotice() { return h("div", { class: "empty" }, h("h3", { text: "Sign in to see Lisle Boards" }), h("p", { text: "Enter the access code from the pilot email and your name." }), h("button", { class: "btn", onclick: () => showSignIn(null), text: "Sign in" })); }
+  function renderHome() {
+    const el = h("section", { class: "home" });
+    el.append(h("div", { class: "home-head" }, h("div", {}, h("h2", { text: "Boards" }), h("p", { text: "Shared boards for Lisle 202 staff: collect ideas, questions, resources, and exit tickets in one place. Choose a board or start a new one." }))));
+    if (!S.ready) { el.append(signInNotice()); return el; }
+    if (!S.boards.length) {
+      el.append(h("div", { class: "empty" }, h("h3", { text: "No boards yet" }), h("p", { text: "The first board you create will appear here with its title, format, and owner. Try the Parking lot or Exit ticket template to see how a board works." }), h("button", { class: "btn", onclick: () => openBoardDialog(null) }, svg(ICON.plus), "New board")));
+      return el;
+    }
+    const ps = profiles([...new Set(S.boards.map(b => b.ownerId).filter(Boolean))]);
+    const list = h("div", { class: "board-list" });
+    for (const b of S.boards) {
+      const owner = ps[b.ownerId];
+      list.append(h("a", { class: "board-card", href: "#" + b.id },
+        h("div", { class: "row" }, h("span", { class: "chip", text: FORMATS[b.format] || "Board" }), b.requireApproval ? h("span", { class: "chip", text: "Moderated" }) : "", b.frozen ? h("span", { class: "chip", text: "Frozen" }) : ""),
+        h("h3", { text: b.title }),
+        b.description ? h("p", { class: "desc", text: b.description }) : "",
+        h("div", { class: "meta" }, owner ? h("span", {}, h("img", { class: "avatar", src: owner.avatarUrl, alt: "" }), " ", owner.name || "Someone") : "", h("span", { text: fmtTime(b.createdAt) }))));
+    }
+    el.append(list); return el;
+  }
+  function visiblePosts(b) { const mod = isModerator(b); return S.posts.filter(p => p.approved !== false || mod || p.authorId === S.me).sort(comparePosts); }
+  function matchesFilter(p, ctx) {
+    const q = S.filter.trim().toLowerCase(); if (!q) return true;
+    const a = ctx.ps[p.authorId]; const sec = sectionsOf(ctx.b).find(s => s.id === p.sectionId);
+    return [p.subject, p.body, p.link, p.imageAlt, a && a.name, sec && sec.title].concat((p.comments || []).map(c => c.text)).some(v => (v || "").toLowerCase().includes(q));
+  }
+  function renderBoardMeta(ctx, all) {
+    const el = $("#board-meta"); if (!el) return; const b = ctx.b;
+    const approved = all.filter(p => p.approved !== false); const people = new Set(approved.map(p => p.authorId).filter(Boolean)).size;
+    el.replaceChildren(h("span", { class: "chip", text: FORMATS[b.format] || "Board" }), b.requireApproval ? h("span", { class: "chip", text: "Moderated" }) : "", ctx.frozen ? h("span", { class: "chip", text: "Frozen" }) : "",
+      h("span", { text: approved.length + (approved.length === 1 ? " post" : " posts") }), h("span", { text: people + (people === 1 ? " contributor" : " contributors") }));
+  }
+  async function renderBoardBody() {
+    const b = S.board; const body = $("#board-body"); if (!b || !body) return;
+    const token = ++S.renderToken;
+    const all = visiblePosts(b);
+    const ids = new Set();
+    for (const p of all) { if (p.authorId) ids.add(p.authorId); for (const c of (p.comments || [])) if (c.authorId) ids.add(c.authorId); }
+    const ps = await getProfiles([...ids]);
+    if (token !== S.renderToken) return;
+    const ctx = { b, ps, mod: isModerator(b), frozen: isFrozen(b) }; S.lastCtx = ctx;
+    migrateOrdering();
+    const posts = all.filter(p => matchesFilter(p, ctx));
+    const count = $("#filter-count"); if (count) count.textContent = S.filter.trim() ? posts.length + " of " + all.length : "";
+    renderBoardMeta(ctx, all);
+    const out = [];
+    const pending = ctx.mod && b.requireApproval ? posts.filter(p => p.approved === false) : [];
+    if (pending.length) {
+      const strip = h("div", { class: "pending-strip" }, h("h3", { text: pending.length + (pending.length === 1 ? " post is waiting for approval" : " posts are waiting for approval") }));
+      for (const p of pending) strip.append(h("div", { class: "row" }, h("strong", { text: p.subject || (p.body || "").slice(0, 60) || "Untitled post" }), h("button", { class: "btn sm", onclick: () => approvePost(p) }, "Approve"), h("button", { class: "btn ghost sm", onclick: () => deletePost(p) }, "Remove")));
+      out.push(strip);
+    }
+    if (!S.posts.length) {
+      S.lastShown = [];
+      out.push(h("div", { class: "empty" }, h("h3", { text: "Nothing posted yet" }), h("p", { text: canContribute(b) ? "Posts appear here as cards with a subject, body, link, or image. Add the first one." : "Posts will appear here as cards." }),
+        canContribute(b) ? h("button", { class: "btn", onclick: () => openPostDialog(null) }, svg(ICON.plus), "New post") : ""));
+      body.replaceChildren(...out); return;
+    }
+    if (!posts.length) { S.lastShown = []; out.push(h("p", { class: "notice", text: "No posts match your search." })); body.replaceChildren(...out); return; }
+    const shown = posts.filter(p => !(p.approved === false && ctx.mod && b.requireApproval));
+    const useSections = usesSections(b);
+    const groups = useSections ? groupBySection(b, shown) : [{ id: null, title: null, posts: shown }];
+    S.lastShown = groups.flatMap(g => g.posts.map(p => ({ p, section: useSections ? g.title : null })));
+    if (b.format === "table") out.push(renderTable(ctx, groups));
+    else if (b.format === "timeline") out.push(...groups.map(g => renderTimeline(ctx, g, useSections)));
+    else if (b.format === "columns") out.push(h("div", { class: "columns" }, groups.map(g => sectionBlock(ctx, g, true))));
+    else {
+      const cls = b.format === "grid" ? "grid" : b.format === "stream" ? "stream" : "wall";
+      if (useSections) out.push(h("div", { class: b.format === "stream" ? "stream" : "board-wrap" }, groups.map(g => sectionBlock(ctx, g, false, cls))));
+      else out.push(h("div", { class: cls, dataset: { section: "" }, ondragover: onDragOverZone, ondragleave: onDragLeaveZone, ondrop: onDropZone }, shown.map(p => postCard(ctx, p))));
+    }
+    body.replaceChildren(...out);
+  }
+  function groupBySection(b, posts) {
+    const secs = sectionsOf(b); const list = secs.length ? secs : [{ id: "s0", title: "Posts" }];
+    const groups = list.map(s => ({ id: s.id, title: s.title, posts: [] })); const first = groups[0];
+    for (const p of posts) (groups.find(g => g.id === p.sectionId) || first).posts.push(p);
+    return groups;
+  }
+  function sectionBlock(ctx, g, isColumn, innerCls) {
+    const blk = h("section", { class: "section-block", dataset: { section: g.id || "" }, ondragover: onDragOverZone, ondragleave: onDragLeaveZone, ondrop: onDropZone });
+    if (g.title != null) blk.append(h("div", { class: "section-head" }, h("h3", { text: g.title }), h("span", { class: "count", text: g.posts.length + (g.posts.length === 1 ? " post" : " posts") })));
+    if (isColumn) blk.append(...g.posts.map(p => postCard(ctx, p))); else blk.append(h("div", { class: innerCls }, g.posts.map(p => postCard(ctx, p))));
+    if (!g.posts.length) blk.append(h("p", { class: "tiny", text: "No posts in this section." }));
+    return blk;
+  }
+  function renderTimeline(ctx, g, useSections) {
+    const track = h("div", { class: "tl-track", dataset: { section: g.id || "" }, ondragover: onDragOverZone, ondragleave: onDragLeaveZone, ondrop: onDropZone }, g.posts.map(p => postCard(ctx, p)));
+    const scroller = h("div", { class: "timeline" }, track);
+    const nav = h("div", { class: "tl-nav" },
+      h("button", { class: "btn ghost sm", "aria-label": "Scroll to start", onclick: () => scroller.scrollTo({ left: 0, behavior: "smooth" }) }, svg(ICON.left), svg(ICON.left)),
+      h("button", { class: "btn ghost sm", "aria-label": "Scroll left", onclick: () => scroller.scrollBy({ left: -320, behavior: "smooth" }) }, svg(ICON.left)),
+      h("button", { class: "btn ghost sm", "aria-label": "Scroll right", onclick: () => scroller.scrollBy({ left: 320, behavior: "smooth" }) }, svg(ICON.right)),
+      h("button", { class: "btn ghost sm", "aria-label": "Scroll to end", onclick: () => scroller.scrollTo({ left: scroller.scrollWidth, behavior: "smooth" }) }, svg(ICON.right), svg(ICON.right)));
+    const wrap = h("div", { class: "timeline-wrap section-block" });
+    if (useSections && g.title != null) wrap.append(h("div", { class: "section-head" }, h("h3", { text: g.title }), h("span", { class: "count", text: g.posts.length + (g.posts.length === 1 ? " post" : " posts") })));
+    wrap.append(nav, scroller); if (!g.posts.length) wrap.append(h("p", { class: "tiny", text: "No posts in this section." }));
+    return wrap;
+  }
+  function renderTable(ctx, groups) {
+    const b = ctx.b; const hasSec = groups.length > 1 || groups[0].id;
+    const head = h("tr", {}, ["Subject", "Body", "Attachment"].map(t => h("th", { text: t })));
+    if (hasSec) head.append(h("th", { text: "Section" })); if (b.showAuthor) head.append(h("th", { text: "Author" })); if (b.showTime) head.append(h("th", { text: "Posted" })); if (b.reactions !== "none") head.append(h("th", { text: "Reactions" })); head.append(h("th", { text: "" }));
+    const tbody = h("tbody");
+    for (const g of groups) for (const p of g.posts) {
+      const a = ctx.ps[p.authorId];
+      const tr = h("tr", {}, h("td", {}, h("strong", { text: p.subject || "" }), p.approved === false ? h("div", { class: "tiny", text: "Awaiting approval" }) : ""), h("td", { class: "cell-body" }, p.body ? linkify(p.body) : ""),
+        h("td", {}, p.link ? h("a", { href: p.link, target: "_blank", rel: "noopener noreferrer", text: hostOf(p.link) }) : "", p.imageId ? h("img", { src: imgUrl(p.imageId), alt: p.imageAlt || "", style: "max-width:120px;border-radius:6px" }) : ""));
+      if (hasSec) tr.append(h("td", { text: g.title || "" })); if (b.showAuthor) tr.append(h("td", { text: a ? (a.name || "Someone") : "" })); if (b.showTime) tr.append(h("td", { text: fmtTime(p.createdAt) })); if (b.reactions !== "none") tr.append(h("td", {}, reactionSummary(p, b)));
+      tr.append(h("td", {}, postMenu(ctx, p))); tbody.append(tr);
+    }
+    return h("div", { class: "table-wrap" }, h("table", { class: "posts" }, h("thead", {}, head), tbody));
+  }
+  function postCard(ctx, p) {
+    const b = ctx.b; const a = ctx.ps[p.authorId]; const pinned = isPinned(p);
+    const excerpt = p.subject || (p.body || "").slice(0, 80) || (p.imageAlt ? "Image: " + p.imageAlt : p.link ? "Link: " + hostOf(p.link) : "Post");
+    const card = h("article", { class: "post" + (p.approved === false ? " pending" : "") + (pinned ? " pinned" : ""), id: "post-" + p.id, tabindex: "0", dataset: { color: p.color || "white", pid: p.id }, draggable: canManage(b, p) ? "true" : null, "aria-labelledby": p.subject ? "post-subj-" + p.id : null, "aria-label": p.subject ? null : excerpt });
+    card.addEventListener("dragstart", onDragStart); card.addEventListener("dragend", onDragEnd);
+    card.addEventListener("dragover", onDragOverPost); card.addEventListener("dragleave", onDragLeavePost); card.addEventListener("drop", onDropPost);
+    if (pinned) card.append(h("span", { class: "pin-flag" }, svg(ICON.pin), "Pinned"));
+    const head = h("div", { class: "post-head" });
+    if (p.subject) head.append(h("h4", { id: "post-subj-" + p.id, text: p.subject })); else head.append(h("span", { style: "flex:1 1 auto" }));
+    head.append(postMenu(ctx, p));
+    card.append(head);
+    if (p.approved === false) card.append(h("p", { class: "tiny", text: "Awaiting approval. Only you and moderators can see this post." }));
+    if (p.imageId) card.append(h("img", { class: "attach", src: imgSrc(p.imageId), alt: p.imageAlt || "", loading: "lazy", onerror: (e) => { e.target.replaceWith(h("p", { class: "tiny", text: "Image unavailable." })); } }));
+    if (p.body) card.append(h("p", { class: "post-body" }, linkify(p.body)));
+    if (p.link) card.append(linkCard(p.link));
+    if (b.showAuthor || b.showTime) {
+      const meta = h("div", { class: "post-meta" });
+      if (b.showAuthor && a) meta.append(h("img", { class: "avatar", src: a.avatarUrl, alt: "" }), h("span", { text: a.name || "Someone" }));
+      if (b.showTime) meta.append(h("span", { text: fmtTime(p.createdAt) + (p.updatedAt && p.updatedAt !== p.createdAt ? " (edited)" : "") }));
+      card.append(meta);
+    }
+    const foot = h("div", { class: "post-foot" });
+    if (b.reactions && b.reactions !== "none") foot.append(reactionControl(ctx, p));
+    if (b.comments) {
+      const n = (p.comments || []).length; const open = S.openComments.has(p.id);
+      foot.append(h("button", { class: "react", "aria-expanded": open ? "true" : "false", "aria-label": open ? "Hide comments" : (n ? "Show " + n + (n === 1 ? " comment" : " comments") : "Comment on this post"), onclick: () => { open ? S.openComments.delete(p.id) : S.openComments.add(p.id); renderBoardBody(); } }, svg(ICON.comment), h("span", { text: n ? n + (n === 1 ? " comment" : " comments") : "Comment" })));
+    }
+    if (foot.childElementCount) card.append(foot);
+    if (b.comments && S.openComments.has(p.id)) card.append(commentsBlock(ctx, p));
+    return card;
+  }
+  function linkCard(url) { return h("a", { class: "link-card", href: url, target: "_blank", rel: "noopener noreferrer" }, svg(ICON.link), h("span", { style: "min-width:0;display:grid" }, h("span", { class: "host", text: hostOf(url) }), h("span", { class: "url", text: url }))); }
+  function menuDetails(summary, list, cls) {
+    const det = h("details", { class: "menu" + (cls ? " " + cls : "") }, summary, list);
+    det.addEventListener("toggle", () => { if (det.open) { const close = (e) => { if (!det.contains(e.target)) { det.open = false; document.removeEventListener("click", close); } }; setTimeout(() => document.addEventListener("click", close), 0); } });
+    return det;
+  }
+  function menuItem(list, label, fn) { list.append(h("button", { type: "button", role: "menuitem", text: label, onclick: (e) => { e.target.closest("details").open = false; fn(); } })); }
+  function postMenu(ctx, p) {
+    if (!canManage(ctx.b, p)) return h("span");
+    const b = ctx.b; const list = h("div", { class: "menu-list", role: "menu" });
+    const add = (label, fn) => menuItem(list, label, fn);
+    add("Edit", () => openPostDialog(p));
+    if (b.format !== "table") { add("Move up", () => nudge(p, -1)); add("Move down", () => nudge(p, 1)); }
+    const secs = sectionsOf(b);
+    if (usesSections(b) && secs.length > 1) for (const s of secs) if (s.id !== p.sectionId) add("Move to " + s.title, () => movePost(p, s.id, null));
+    if (ctx.mod) add(isPinned(p) ? "Unpin" : "Pin to top", () => setPinned(p, !isPinned(p)));
+    if (p.approved === false && ctx.mod) add("Approve", () => approvePost(p));
+    list.append(h("hr"));
+    add("Delete", () => deletePost(p));
+    return menuDetails(h("summary", { "aria-label": "Post actions", title: "Post actions" }, svg(ICON.dots)), list);
+  }
+  function exportMenu() {
+    const list = h("div", { class: "menu-list", role: "menu" });
+    menuItem(list, "Spreadsheet (CSV)", () => exportBoard("csv"));
+    menuItem(list, "Markdown (.md)", () => exportBoard("md"));
+    menuItem(list, "Print", printBoard);
+    menuItem(list, "QR code for the link", openQr);
+    return menuDetails(h("summary", { class: "btn ghost", "aria-label": "Export or share this board", title: "Export or share this board" }, svg(ICON.download), "Export"), list, "tool-menu");
+  }
+
+  // ---------- Reactions ----------
+  function reactionSummary(p, b) {
+    const vals = Object.values(p.reactions || {}).filter(v => v != null && v !== 0 && v !== false);
+    if (b.reactions === "like") return h("span", { text: vals.length + (vals.length === 1 ? " like" : " likes") });
+    if (b.reactions === "vote") { const net = vals.reduce((s, v) => s + (v > 0 ? 1 : -1), 0); return h("span", { text: (net > 0 ? "+" : "") + net + " votes" }); }
+    const nums = vals.map(Number).filter(n => !isNaN(n)); if (!nums.length) return h("span", { class: "tiny", text: "None yet" });
+    const avg = nums.reduce((s, n) => s + n, 0) / nums.length;
+    return h("span", { text: (b.reactions === "star" ? avg.toFixed(1) + " of 5 stars" : "Grade " + avg.toFixed(avg % 1 ? 1 : 0)) + " (" + nums.length + ")" });
+  }
+  function reactionControl(ctx, p) {
+    const b = ctx.b; const r = p.reactions || {}; const mine = S.me ? r[S.me] : null; const can = canContribute(b);
+    const vals = Object.values(r).filter(v => v != null && v !== 0 && v !== false);
+    if (b.reactions === "like") {
+      const tally = vals.length ? " (" + vals.length + (vals.length === 1 ? " like)" : " likes)") : "";
+      return h("button", { class: "react", "aria-pressed": mine ? "true" : "false", "aria-label": (mine ? "Remove your like" : "Like this post") + tally, disabled: !can, onclick: () => setReaction(p, mine ? null : true) }, svg(ICON.thumb), h("span", { text: vals.length ? String(vals.length) : "Like" }));
+    }
+    if (b.reactions === "vote") {
+      const net = vals.reduce((s, v) => s + (v > 0 ? 1 : -1), 0);
+      return h("span", { class: "row", style: "gap:4px" },
+        h("button", { class: "react", "aria-label": mine === 1 ? "Remove your up vote" : "Vote this post up", "aria-pressed": mine === 1 ? "true" : "false", disabled: !can, onclick: () => setReaction(p, mine === 1 ? null : 1) }, svg(ICON.up)),
+        h("span", { class: "tiny", style: "font-family:var(--font-head);font-weight:700;min-width:2ch;text-align:center", title: "Net votes", text: (net > 0 ? "+" : "") + net }),
+        h("button", { class: "react", "aria-label": mine === -1 ? "Remove your down vote" : "Vote this post down", "aria-pressed": mine === -1 ? "true" : "false", disabled: !can, onclick: () => setReaction(p, mine === -1 ? null : -1) }, svg(ICON.down)));
+    }
+    if (b.reactions === "star") {
+      const nums = vals.map(Number); const avg = nums.length ? nums.reduce((s, n) => s + n, 0) / nums.length : 0;
+      const stars = h("span", { class: "stars", role: "group", "aria-label": "Star rating" });
+      for (let i = 1; i <= 5; i++) stars.append(h("button", { type: "button", "aria-label": mine === i ? "Remove your " + i + "-star rating" : "Rate this post " + i + (i === 1 ? " star" : " stars"), "aria-pressed": mine >= i ? "true" : "false", disabled: !can, onclick: () => setReaction(p, mine === i ? null : i) }, svg(ICON.star)));
+      return h("span", { class: "row", style: "gap:6px" }, stars, h("span", { class: "tiny", text: nums.length ? avg.toFixed(1) + " avg (" + nums.length + ")" : "No ratings yet" }));
+    }
+    if (b.reactions === "grade") {
+      const nums = vals.map(Number); const avg = nums.length ? nums.reduce((s, n) => s + n, 0) / nums.length : null;
+      const wrap = h("span", { class: "row", style: "gap:8px" }, h("span", { class: "tiny", text: avg == null ? "Not graded" : "Grade " + avg.toFixed(avg % 1 ? 1 : 0) + (nums.length > 1 ? " (avg of " + nums.length + ")" : "") }));
+      if (ctx.mod && can) {
+        const inp = h("input", { type: "number", min: "0", max: "100", step: "1", value: mine != null ? mine : "", "aria-label": "Grade out of 100" });
+        wrap.append(h("form", { class: "grade-form", onsubmit: (e) => { e.preventDefault(); const v = inp.value === "" ? null : Math.max(0, Math.min(100, Number(inp.value))); setReaction(p, v); } }, inp, h("button", { class: "react", type: "submit", "aria-label": "Save this grade" }, h("span", { text: "Save" }))));
+      }
+      return wrap;
+    }
+    return h("span");
+  }
+  async function setReaction(p, val) { if (!S.me) return; try { await write("update", "boards/" + S.board.id + "/posts/" + p.id, { data: { reactions: { [S.me]: val } } }); } catch (e) { writeError(e); } }
+
+  // ---------- Comments ----------
+  function commentsBlock(ctx, p) {
+    const block = h("div", { class: "comments", id: "comments-" + p.id });
+    for (const c of (p.comments || [])) {
+      const a = ctx.ps[c.authorId];
+      block.append(h("div", { class: "comment" },
+        h("img", { class: "avatar", src: a ? a.avatarUrl : avatarFor("", ""), alt: "" }),
+        h("div", {}, h("span", { class: "who", text: a ? (a.name || "Someone") : "Someone" }), h("span", { class: "when", text: fmtTime(c.createdAt) }), h("p", {}, linkify(c.text || ""))),
+        canManage(ctx.b, { authorId: c.authorId }) ? h("button", { class: "btn ghost sm", "aria-label": "Delete this comment", onclick: () => deleteComment(p, c.id) }, "Delete") : h("span")));
+    }
+    if (!(p.comments || []).length) block.append(h("p", { class: "tiny", text: "No comments yet." }));
+    if (canContribute(ctx.b)) {
+      const ta = h("textarea", { placeholder: "Write a comment", "aria-label": "Write a comment", maxlength: "2000", id: "c-" + p.id });
+      ta.value = S.drafts[p.id] || ""; ta.addEventListener("input", () => { S.drafts[p.id] = ta.value; });
+      block.append(h("form", { class: "comment-form", onsubmit: (e) => { e.preventDefault(); addComment(p, ta.value); } }, ta, h("div", { class: "row", style: "justify-content:flex-end" }, h("button", { class: "btn sm", type: "submit", text: "Comment" }))));
+    }
+    return block;
+  }
+  async function addComment(p, text) {
+    text = (text || "").trim(); if (!text || !S.me) return;
+    const cur = S.posts.find(x => x.id === p.id) || p;
+    try { await write("update", "boards/" + S.board.id + "/posts/" + p.id, { data: { comments: [...(cur.comments || []), { id: rid("c"), authorId: S.me, text, createdAt: Date.now() }] } }); delete S.drafts[p.id]; } catch (e) { writeError(e); }
+  }
+  async function deleteComment(p, cid) { const cur = S.posts.find(x => x.id === p.id) || p; try { await write("update", "boards/" + S.board.id + "/posts/" + p.id, { data: { comments: (cur.comments || []).filter(c => c.id !== cid) } }); } catch (e) { writeError(e); } }
+
+  // ---------- Post ordering, pins, and drag ----------
+  // Posts and sections carry a sparse numeric sortIndex with wide gaps (GAP), so dropping a post between two
+  // neighbors writes one document. Older posts that only have the legacy "order" field sort by order * GAP
+  // until a moderator opens the board, when migrateOrdering() stores the same value for them.
+  const sortKey = (p) => (typeof p.sortIndex === "number" && isFinite(p.sortIndex)) ? p.sortIndex : (p.order || 0) * GAP;
+  const isPinned = (p) => !!p.pinnedAt;
+  function comparePosts(a, c) { return ((isPinned(c) ? 1 : 0) - (isPinned(a) ? 1 : 0)) || (sortKey(a) - sortKey(c)) || ((a.createdAt || 0) - (c.createdAt || 0)); }
+  function sectionsOf(b) { return ((b && b.sections) || []).map((s, i) => Object.assign({}, s, { sortIndex: typeof s.sortIndex === "number" ? s.sortIndex : (i + 1) * GAP })).sort((a, c) => a.sortIndex - c.sortIndex); }
+  function usesSections(b) { return b.format === "columns" || (!!b.useSections && b.format !== "wall"); }
+  function laneOf(sectionId, pinned, exceptId) { return visiblePosts(S.board).filter(x => (x.sectionId || null) === (sectionId || null) && isPinned(x) === !!pinned && x.id !== exceptId); }
+  function betweenIndex(before, after) { if (before == null && after == null) return GAP; if (before == null) return after - GAP; if (after == null) return before + GAP; return (before + after) / 2; }
+  function endIndex(lane, atTop) { if (!lane.length) return GAP; return atTop ? sortKey(lane[0]) - GAP : sortKey(lane[lane.length - 1]) + GAP; }
+  async function renumberLane(lane) { let i = 0; for (const x of lane) { i += GAP; x.sortIndex = i; await writePost(x.id, { sortIndex: i }); } }
+  async function movePost(p, sectionId, beforePid) {
+    const lane = laneOf(sectionId, isPinned(p), p.id);
+    let idx = beforePid ? lane.findIndex(x => x.id === beforePid) : lane.length; if (idx < 0) idx = lane.length;
+    try {
+      let before = idx > 0 ? sortKey(lane[idx - 1]) : null, after = idx < lane.length ? sortKey(lane[idx]) : null;
+      let si = betweenIndex(before, after);
+      if (before != null && after != null && !(si > before && si < after)) { await renumberLane(lane); before = lane[idx - 1].sortIndex; after = lane[idx].sortIndex; si = (before + after) / 2; }
+      await writePost(p.id, { sectionId: sectionId || null, sortIndex: si });
+    } catch (e) { writeError(e); }
+  }
+  function nudge(p, dir) {
+    const lane = laneOf(p.sectionId, isPinned(p));
+    const i = lane.findIndex(x => x.id === p.id); const j = i + dir; if (i < 0 || j < 0 || j >= lane.length) return;
+    movePost(p, p.sectionId, dir < 0 ? lane[j].id : (lane[j + 1] ? lane[j + 1].id : null));
+  }
+  async function setPinned(p, on) { try { await writePost(p.id, { pinnedAt: on ? Date.now() : null }); toast(on ? "Pinned to the top." : "Unpinned."); } catch (e) { writeError(e); } }
+  function migrateOrdering() {
+    const b = S.board; if (!b || !S.postsLoaded || S.migratedFor === b.id || !mayPost() || !isModerator(b)) return;
+    S.migratedFor = b.id;
+    const stale = S.posts.filter(p => typeof p.sortIndex !== "number");
+    const secs = b.sections || []; const secStale = secs.length > 0 && secs.some(s => typeof s.sortIndex !== "number");
+    if (!stale.length && !secStale) return;
+    (async () => {
+      try {
+        for (const p of stale) await writePost(p.id, { sortIndex: sortKey(p) });
+        if (secStale) await writeBoard(b.id, { sections: sectionsOf(b).map(s => ({ id: s.id, title: s.title, sortIndex: s.sortIndex })) });
+      } catch (e) { console.warn("Could not store the sort order for older posts.", e); }
+    })();
+  }
+  let dragPid = null;
+  function onDragStart(e) { dragPid = this.dataset.pid; this.classList.add("dragging"); try { e.dataTransfer.setData("text/plain", dragPid); e.dataTransfer.effectAllowed = "move"; } catch (x) {} }
+  function onDragEnd() { dragPid = null; this.classList.remove("dragging"); $$(".over-before").forEach(x => x.classList.remove("over-before")); $$(".over").forEach(x => x.classList.remove("over")); }
+  function onDragOverPost(e) { if (!dragPid || this.dataset.pid === dragPid) return; e.preventDefault(); e.stopPropagation(); this.classList.add("over-before"); }
+  function onDragLeavePost() { this.classList.remove("over-before"); }
+  function onDropPost(e) { if (!dragPid) return; e.preventDefault(); e.stopPropagation(); this.classList.remove("over-before"); const target = S.posts.find(x => x.id === this.dataset.pid); const p = S.posts.find(x => x.id === dragPid); if (!p || !target || p.id === target.id) return; movePost(p, target.sectionId || null, target.id); dragPid = null; }
+  function onDragOverZone(e) { if (!dragPid) return; e.preventDefault(); this.classList.add("over"); }
+  function onDragLeaveZone(e) { if (!this.contains(e.relatedTarget)) this.classList.remove("over"); }
+  function onDropZone(e) { if (!dragPid) return; e.preventDefault(); this.classList.remove("over"); const p = S.posts.find(x => x.id === dragPid); if (!p) return; movePost(p, this.dataset.section || null, null); dragPid = null; }
+
+  // ---------- Post dialog ----------
+  function openPostDialog(p) {
+    const b = S.board; if (!b) return;
+    if (!p && !canContribute(b)) { toast(isFrozen(b) ? "This board is frozen, so new posts are off." : "Posting is off for you on this board."); return; }
+    S.editingPost = p; S.pendingImage = null; S.removeImage = false;
+    $("#dlg-post-title").textContent = p ? "Edit post" : "New post"; $("#p-save").textContent = p ? "Save" : "Post";
+    $("#p-subject").value = p ? (p.subject || "") : ""; $("#p-body").value = p ? (p.body || "") : ""; $("#p-link").value = p ? (p.link || "") : ""; $("#p-alt").value = p ? (p.imageAlt || "") : "";
+    $("#p-subject").placeholder = b.requireSubject ? "Required" : "Optional"; $("#p-body").placeholder = b.requireBody ? "Required" : "Optional";
+    const prev = $("#p-image-preview"); const rm = $("#p-image-remove"); $("#p-image").value = "";
+    if (p && p.imageId) { prev.src = imgUrl(p.imageId); prev.hidden = false; rm.hidden = false; } else { prev.hidden = true; rm.hidden = true; prev.removeAttribute("src"); }
+    const useSections = usesSections(b);
+    $("#p-section-field").hidden = !useSections;
+    const sel = $("#p-section"); sel.replaceChildren(...sectionsOf(b).map(s => h("option", { value: s.id, text: s.title }))); if (p && p.sectionId) sel.value = p.sectionId;
+    const color = p ? (p.color || "white") : "white"; $$("#swatches input").forEach(i => { i.checked = i.value === color; });
+    $("#p-err").hidden = true; $("#dlg-post").showModal(); setTimeout(() => $("#p-subject").focus(), 30);
+  }
+  $("#p-image").addEventListener("change", (e) => {
+    const f = e.target.files && e.target.files[0]; if (!f) return;
+    if (f.size > 25 * 1024 * 1024) { $("#p-err").textContent = "That image is larger than 25 MB. Choose a smaller file."; $("#p-err").hidden = false; e.target.value = ""; return; }
+    S.pendingImage = f; S.removeImage = false;
+    const r = new FileReader(); r.onload = () => { $("#p-image-preview").src = r.result; $("#p-image-preview").hidden = false; $("#p-image-remove").hidden = false; }; r.readAsDataURL(f);
+  });
+  $("#p-image-remove").addEventListener("click", () => { S.pendingImage = null; S.removeImage = true; $("#p-image").value = ""; $("#p-image-preview").hidden = true; $("#p-image-remove").hidden = true; $("#p-alt").value = ""; });
+  $("#form-post").addEventListener("submit", async (e) => {
+    e.preventDefault(); const b = S.board; if (!b) return; const err = $("#p-err"); err.hidden = true;
+    const subject = $("#p-subject").value.trim(), body = $("#p-body").value.trim(), link = $("#p-link").value.trim(), alt = $("#p-alt").value.trim();
+    const color = ($$("#swatches input").find(i => i.checked) || {}).value || "white";
+    const useSections = usesSections(b);
+    const sectionId = useSections ? ($("#p-section").value || (sectionsOf(b)[0] || {}).id || null) : (S.editingPost ? (S.editingPost.sectionId || null) : null);
+    if (b.requireSubject && !subject) { err.textContent = "This board requires a subject."; err.hidden = false; return; }
+    if (b.requireBody && !body) { err.textContent = "This board requires a body."; err.hidden = false; return; }
+    if (link && !/^https?:\/\//i.test(link)) { err.textContent = "Links must start with http:// or https://."; err.hidden = false; return; }
+    const willHaveImage = S.pendingImage || (S.editingPost && S.editingPost.imageId && !S.removeImage);
+    if (willHaveImage && !alt) { err.textContent = "Add a short description of the image so it is accessible."; err.hidden = false; return; }
+    if (!subject && !body && !link && !willHaveImage) { err.textContent = "Add a subject, body, link, or image."; err.hidden = false; return; }
+    const save = $("#p-save"); save.disabled = true; save.textContent = "Saving";
+    try {
+      let imageId = S.editingPost ? (S.editingPost.imageId || null) : null; let oldImage = null;
+      if (S.removeImage && imageId) { oldImage = imageId; imageId = null; }
+      if (S.pendingImage) { if (imageId) oldImage = imageId; imageId = await uploadImage(S.pendingImage); }
+      if (S.editingPost) {
+        const p = S.editingPost; const patch = { subject, body, link, imageId, imageAlt: imageId ? alt : "", color };
+        if ((p.sectionId || null) !== (sectionId || null)) { patch.sectionId = sectionId; patch.sortIndex = endIndex(laneOf(sectionId, isPinned(p), p.id), b.newPostPos === "top"); }
+        await write("update", "boards/" + b.id + "/posts/" + p.id, { data: patch }); toast("Post updated.");
+      } else {
+        const sortIndex = endIndex(laneOf(sectionId, false), b.newPostPos === "top");
+        const approved = !(b.requireApproval && !isModerator(b));
+        await write("set", "boards/" + b.id + "/posts/" + rid("x"), { data: { subject, body, link, imageId, imageAlt: imageId ? alt : "", color, sectionId, sortIndex } });
+        toast(approved ? "Posted." : "Posted. A moderator will review it before it appears to others.");
+      }
+      if (oldImage) deleteImage(oldImage);
+      $("#dlg-post").close();
+    } catch (x) { if (x && (x.code === "too_large" || x.code === "forbidden" || x.code === "server") && x.message) { err.textContent = x.message; err.hidden = false; } else writeError(x); }
+    finally { save.disabled = false; save.textContent = S.editingPost ? "Save" : "Post"; }
+  });
+  async function approvePost(p) { try { await write("update", "boards/" + S.board.id + "/posts/" + p.id, { data: { approved: true } }); toast("Approved."); } catch (e) { writeError(e); } }
+  async function deletePost(p) {
+    const ok = await confirmDialog("Delete this post?", "This removes the post, its comments, and its image for everyone. It cannot be undone.", "Delete"); if (!ok) return;
+    try { await write("delete", "boards/" + S.board.id + "/posts/" + p.id); toast("Post deleted."); } catch (e) { writeError(e); }
+  }
+
+  // ---------- Board dialog ----------
+  let secRows = [];
+  const sortedRows = () => secRows.slice().sort((a, c) => a.sortIndex - c.sortIndex);
+  const nextSecIndex = () => secRows.length ? Math.max(...secRows.map(s => s.sortIndex)) + GAP : GAP;
+  function moveSecRow(s, dir) {
+    const rows = sortedRows(); const i = rows.indexOf(s); const j = i + dir; if (i < 0 || j < 0 || j >= rows.length) return;
+    const others = rows.filter(r => r !== s);
+    const place = () => { const before = others[j - 1] ? others[j - 1].sortIndex : null, after = others[j] ? others[j].sortIndex : null; return [before, after, betweenIndex(before, after)]; };
+    let [before, after, si] = place();
+    if (before != null && after != null && !(si > before && si < after)) { others.forEach((r, k) => { r.sortIndex = (k + 1) * GAP; }); [before, after, si] = place(); }
+    s.sortIndex = si; renderSecRows();
+  }
+  function renderSecRows() {
+    const list = $("#sec-list"); list.replaceChildren(); const rows = sortedRows();
+    rows.forEach((s, i) => {
+      const inp = h("input", { type: "text", value: s.title, "aria-label": "Section " + (i + 1) + " name", maxlength: "80", oninput: (e) => { s.title = e.target.value; } });
+      list.append(h("div", { class: "sec-row" }, inp,
+        h("button", { type: "button", class: "btn ghost sm", "aria-label": "Move section up", disabled: i === 0, onclick: () => moveSecRow(s, -1) }, svg(ICON.up)),
+        h("button", { type: "button", class: "btn ghost sm", "aria-label": "Move section down", disabled: i === rows.length - 1, onclick: () => moveSecRow(s, 1) }, svg(ICON.down)),
+        h("button", { type: "button", class: "btn ghost sm", "aria-label": "Remove section", disabled: rows.length <= 1, onclick: () => { secRows.splice(secRows.indexOf(s), 1); renderSecRows(); } }, "Remove")));
+    });
+  }
+  $("#sec-add").addEventListener("click", () => { secRows.push({ id: rid("s"), title: "Section " + (secRows.length + 1), sortIndex: nextSecIndex() }); renderSecRows(); setTimeout(() => { const last = $$("#sec-list input").pop(); last && last.focus(); }, 0); });
+  function syncSectionsVisibility() {
+    const fmt = $("#b-format").value; const cb = $("#b-usesections");
+    if (fmt === "columns") { cb.checked = true; cb.disabled = true; } else if (fmt === "wall") { cb.checked = false; cb.disabled = true; } else cb.disabled = false;
+    $("#sections-field").hidden = !cb.checked;
+    if (cb.checked && !secRows.length) { secRows = [{ id: rid("s"), title: "Section 1", sortIndex: GAP }]; renderSecRows(); }
+  }
+  $("#b-format").addEventListener("change", syncSectionsVisibility); $("#b-usesections").addEventListener("change", syncSectionsVisibility);
+  function applyTemplate(t) {
+    $("#b-format").value = t.format; $("#b-usesections").checked = t.useSections; secRows = (t.sections || []).map((title, i) => ({ id: rid("s"), title, sortIndex: (i + 1) * GAP })); renderSecRows();
+    $("#b-reqsubject").checked = t.requireSubject; $("#b-reqbody").checked = t.requireBody; $("#b-newpos").value = t.newPostPos; $("#b-comments").checked = t.comments; $("#b-reactions").value = t.reactions; $("#b-approval").checked = t.requireApproval;
+    if (t.description && !$("#b-desc").value) $("#b-desc").value = t.description; syncSectionsVisibility();
+  }
+  function openBoardDialog(b) {
+    const editing = !!b; S.editingBoard = b;
+    $("#dlg-board-title").textContent = editing ? "Board settings" : "New board"; $("#b-save").textContent = editing ? "Save settings" : "Create board";
+    $("#tpl-wrap").hidden = editing; $("#b-danger").hidden = !editing; $("#b-frozen-wrap").hidden = !editing; $("#b-err").hidden = true;
+    if (!editing) { $("#templates").replaceChildren(...TEMPLATES.map((t, i) => h("label", { class: "tpl" }, h("input", { type: "radio", name: "tpl", value: t.id, checked: i === 0, onchange: () => applyTemplate(t) }), h("b", { text: t.name }), h("span", { text: t.desc })))); $("#b-title").value = ""; $("#b-desc").value = ""; $("#b-frozen").checked = false; applyTemplate(TEMPLATES[0]); }
+    else {
+      $("#b-title").value = b.title || ""; $("#b-desc").value = b.description || ""; $("#b-format").value = b.format || "wall"; $("#b-usesections").checked = !!b.useSections;
+      secRows = sectionsOf(b).map(s => ({ id: s.id, title: s.title, sortIndex: s.sortIndex })); renderSecRows();
+      $("#b-reqsubject").checked = !!b.requireSubject; $("#b-reqbody").checked = !!b.requireBody; $("#b-showauthor").checked = b.showAuthor !== false; $("#b-showtime").checked = b.showTime !== false;
+      $("#b-newpos").value = b.newPostPos || "top"; $("#b-comments").checked = b.comments !== false; $("#b-reactions").value = b.reactions || "none"; $("#b-approval").checked = !!b.requireApproval; $("#b-frozen").checked = !!b.frozen; syncSectionsVisibility();
+    }
+    $("#dlg-board").showModal(); setTimeout(() => $("#b-title").focus(), 30);
+  }
+  $("#form-board").addEventListener("submit", async (e) => {
+    e.preventDefault(); const err = $("#b-err"); err.hidden = true;
+    const title = $("#b-title").value.trim(); if (!title) { err.textContent = "Give the board a title."; err.hidden = false; return; }
+    const format = $("#b-format").value; const useSections = format === "columns" ? true : format === "wall" ? false : $("#b-usesections").checked;
+    const sections = sortedRows().map(s => ({ id: s.id, title: (s.title || "").trim() || "Untitled section", sortIndex: s.sortIndex })); // kept even when sections are off, so turning them back on restores the grouping
+    if (useSections && !sections.length) { err.textContent = "Add at least one section, or turn sections off."; err.hidden = false; return; }
+    const data = { title, description: $("#b-desc").value.trim(), format, useSections, sections, requireSubject: $("#b-reqsubject").checked, requireBody: $("#b-reqbody").checked, showAuthor: $("#b-showauthor").checked, showTime: $("#b-showtime").checked, newPostPos: $("#b-newpos").value, comments: $("#b-comments").checked, reactions: $("#b-reactions").value, requireApproval: $("#b-approval").checked, frozen: $("#b-frozen").checked };
+    const save = $("#b-save"); save.disabled = true;
+    try {
+      if (S.editingBoard) { await write("update", "boards/" + S.editingBoard.id, { data }); toast("Settings saved."); $("#dlg-board").close(); }
+      else { const id = rid("x"); await write("set", "boards/" + id, { data }); $("#dlg-board").close(); go("#" + id); toast("Board created."); }
+    } catch (x) { err.textContent = x.message || "Could not save."; err.hidden = false; } finally { save.disabled = false; }
+  });
+  $("#b-delete").addEventListener("click", async () => {
+    const b = S.editingBoard; if (!b) return; $("#dlg-board").close();
+    const ok = await confirmDialog("Delete \"" + b.title + "\"?", "This deletes the board and every post on it for everyone. It cannot be undone.", "Delete board"); if (!ok) return;
+    try { await write("delete", "boards/" + b.id); toast("Board deleted."); go("#"); } catch (x) { writeError(x); }
+  });
+
+  // ---------- Share and export ----------
+  function boardLink() { return location.href.split("#")[0] + "#" + S.board.id; }
+  async function copyBoardLink() {
+    const link = boardLink();
+    try { await navigator.clipboard.writeText(link); toast("Link copied. Anyone with the access code can open it."); }
+    catch (e) { const box = h("input", { type: "text", value: link, readonly: true, "aria-label": "Board link", style: "width:100%" }); $("#board-body").prepend(h("p", { class: "notice" }, "Copy this link: ", box)); box.select(); }
+  }
+  function saveFile(filename, text, type) { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = filename; document.body.append(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); }
+  function fileStem(b) { return "Lisle202_Boards_" + b.title.replace(/[^A-Za-z0-9]+/g, "") + "_" + new Date().toISOString().slice(0, 10).replace(/-/g, ""); }
+  function secName(b, id) { return (sectionsOf(b).find(s => s.id === id) || {}).title || ""; }
+  const personName = (ps, id) => (ps[id] ? (ps[id].name || "Someone") : "Someone");
+  function boardCsv(b, posts, ps) {
+    const q = (v) => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"';
+    const rows = [["Section", "Subject", "Body", "Link", "Image description", "Author", "Posted", "Pinned", "Reactions", "Comments"].map(q).join(",")];
+    for (const p of posts) rows.push([secName(b, p.sectionId), p.subject, p.body, p.link, p.imageAlt, b.showAuthor && ps[p.authorId] ? (ps[p.authorId].name || "Someone") : "", new Date(p.createdAt).toISOString(), isPinned(p) ? "Yes" : "", reactionSummary(p, b).textContent, (p.comments || []).map(c => personName(ps, c.authorId) + ": " + c.text).join(" | ")].map(q).join(","));
+    return "﻿" + rows.join("\r\n");
+  }
+  function boardMarkdown(b, posts, ps) {
+    const lines = ["# " + b.title, ""];
+    if (b.description) lines.push(b.description, "");
+    lines.push("Lisle Boards, " + (FORMATS[b.format] || "Board") + " layout. " + posts.length + (posts.length === 1 ? " post" : " posts") + ". Exported " + fmtTime(Date.now()) + ".", "", boardLink(), "");
+    const groups = usesSections(b) ? groupBySection(b, posts) : [{ id: null, title: null, posts }];
+    for (const g of groups) {
+      if (g.title != null) lines.push("## " + g.title, "");
+      if (!g.posts.length) { lines.push("_No posts in this section._", ""); continue; }
+      for (const p of g.posts) {
+        lines.push("### " + (p.subject || "Untitled post") + (isPinned(p) ? " (pinned)" : ""), "");
+        if (p.body) lines.push(p.body, "");
+        if (p.link) lines.push("Link: " + p.link, "");
+        if (p.imageId) lines.push("Image: " + (p.imageAlt || "no description"), "");
+        const meta = []; if (b.showAuthor) meta.push(personName(ps, p.authorId)); if (b.showTime) meta.push(fmtTime(p.createdAt)); if (b.reactions && b.reactions !== "none") meta.push(reactionSummary(p, b).textContent);
+        if (meta.length) lines.push("_" + meta.join(", ") + "_", "");
+        if (b.comments && (p.comments || []).length) { for (const c of p.comments) lines.push("- " + personName(ps, c.authorId) + ": " + (c.text || "").replace(/\s*\n\s*/g, " ")); lines.push(""); }
+      }
+    }
+    return lines.join("\n");
+  }
+  async function exportBoard(kind) {
+    const b = S.board; const posts = visiblePosts(b).filter(p => p.approved !== false);
+    const ids = [...new Set(posts.flatMap(p => [p.authorId].concat((p.comments || []).map(c => c.authorId))).filter(Boolean))];
+    const ps = await getProfiles(ids);
+    if (kind === "md") await saveText(fileStem(b) + ".md", boardMarkdown(b, posts, ps), "text/markdown;charset=utf-8", "Markdown export ready.");
+    else await saveText(fileStem(b) + ".csv", boardCsv(b, posts, ps), "text/csv;charset=utf-8", "Spreadsheet export ready.");
+  }
+  function printBoard() {
+    let printed = false;
+    try { printed = window.print() !== false; } catch (e) { printed = false; }
+    if (!printed) toast("Printing is not available here. Use your browser's Print command instead.");
+  }
+  function openQr() {
+    const link = boardLink(); const box = $("#qr-box"); box.replaceChildren(); S.qrSvg = null;
+    try {
+      const node = QR.svgNode(link, "#183760"); node.setAttribute("role", "img"); node.setAttribute("aria-label", "QR code that opens this board");
+      box.append(node, h("p", { text: "Scan with a phone camera to open this board. Anyone who scans it still needs the access code." }), h("p", { class: "url", text: link }));
+      S.qrSvg = new XMLSerializer().serializeToString(node); $("#qr-download").hidden = false;
+    } catch (e) { box.append(h("p", { class: "err", text: "This link is too long for a QR code." })); $("#qr-download").hidden = true; }
+    $("#dlg-qr").showModal();
+  }
+  $("#qr-download").addEventListener("click", () => { if (S.qrSvg && S.board) saveText(fileStem(S.board) + "_QR.svg", S.qrSvg, "image/svg+xml", "QR code saved."); });
+
+  // ---------- QR code encoder (byte mode, versions 1 to 10, error correction M, then L) ----------
+  // Small self-contained encoder so the board link can be shown as a QR code without any outside service.
+  const QR = (() => {
+    const ECC = { M: { bits: 0, perBlock: [0, 10, 16, 26, 18, 24, 16, 18, 22, 22, 26], blocks: [0, 1, 1, 1, 2, 2, 4, 4, 4, 5, 5] },
+                  L: { bits: 1, perBlock: [0, 7, 10, 15, 20, 26, 18, 20, 24, 30, 18], blocks: [0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 4] } };
+    function rawModules(v) { let r = (16 * v + 128) * v + 64; if (v >= 2) { const n = Math.floor(v / 7) + 2; r -= (25 * n - 10) * n - 55; if (v >= 7) r -= 36; } return r; }
+    function capacityBytes(v, e) { return Math.floor(rawModules(v) / 8) - e.perBlock[v] * e.blocks[v]; }
+    function gfMul(x, y) { let z = 0; for (let i = 7; i >= 0; i--) { z = (z << 1) ^ ((z >>> 7) * 0x11D); z ^= ((y >>> i) & 1) * x; } return z; }
+    function rsDivisor(deg) { const r = new Array(deg).fill(0); r[deg - 1] = 1; let root = 1; for (let i = 0; i < deg; i++) { for (let j = 0; j < deg; j++) r[j] = gfMul(r[j], root) ^ (j + 1 < deg ? r[j + 1] : 0); root = gfMul(root, 2); } return r; }
+    function rsRemainder(data, div) { const r = div.map(() => 0); for (const b of data) { const f = b ^ r.shift(); r.push(0); div.forEach((c, i) => { r[i] ^= gfMul(c, f); }); } return r; }
+    function codewords(bytes, v, e) {
+      const cap = capacityBytes(v, e) * 8; const bits = []; const put = (val, n) => { for (let i = n - 1; i >= 0; i--) bits.push((val >>> i) & 1); };
+      put(4, 4); put(bytes.length, v < 10 ? 8 : 16); for (const b of bytes) put(b, 8);
+      put(0, Math.min(4, cap - bits.length)); while (bits.length % 8) bits.push(0);
+      for (let pad = 0xEC; bits.length < cap; pad ^= 0xEC ^ 0x11) put(pad, 8);
+      const data = []; for (let i = 0; i < bits.length; i += 8) data.push(parseInt(bits.slice(i, i + 8).join(""), 2));
+      const nb = e.blocks[v], el = e.perBlock[v], raw = Math.floor(rawModules(v) / 8), nshort = nb - raw % nb, slen = Math.floor(raw / nb);
+      const blocks = []; const div = rsDivisor(el);
+      for (let i = 0, k = 0; i < nb; i++) { const dat = data.slice(k, k + slen - el + (i < nshort ? 0 : 1)); k += dat.length; const ecc = rsRemainder(dat, div); if (i < nshort) dat.push(0); blocks.push(dat.concat(ecc)); }
+      const out = []; for (let i = 0; i < blocks[0].length; i++) blocks.forEach((blk, j) => { if (i !== slen - el || j >= nshort) out.push(blk[i]); });
+      return out;
+    }
+    function matrix(v, e, cw) {
+      const size = v * 4 + 17; const mod = Array.from({ length: size }, () => new Array(size).fill(false)); const fn = Array.from({ length: size }, () => new Array(size).fill(false));
+      const set = (x, y, dark) => { mod[y][x] = dark; fn[y][x] = true; };
+      for (let i = 0; i < size; i++) { set(6, i, i % 2 === 0); set(i, 6, i % 2 === 0); }
+      const finder = (x, y) => { for (let dy = -4; dy <= 4; dy++) for (let dx = -4; dx <= 4; dx++) { const d = Math.max(Math.abs(dx), Math.abs(dy)); const xx = x + dx, yy = y + dy; if (xx >= 0 && xx < size && yy >= 0 && yy < size) set(xx, yy, d !== 2 && d !== 4); } };
+      finder(3, 3); finder(size - 4, 3); finder(3, size - 4);
+      if (v >= 2) {
+        const n = Math.floor(v / 7) + 2; const step = Math.ceil((v * 4 + 4) / (n * 2 - 2)) * 2; const pos = [6]; for (let p = size - 7; pos.length < n; p -= step) pos.splice(1, 0, p);
+        for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) { if ((i === 0 && j === 0) || (i === 0 && j === n - 1) || (i === n - 1 && j === 0)) continue; for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) set(pos[i] + dx, pos[j] + dy, Math.max(Math.abs(dx), Math.abs(dy)) !== 1); }
+      }
+      const format = (mask) => {
+        const data = e.bits << 3 | mask; let rem = data; for (let i = 0; i < 10; i++) rem = (rem << 1) ^ ((rem >>> 9) * 0x537); const bits = (data << 10 | rem) ^ 0x5412; const bit = (i) => ((bits >>> i) & 1) === 1;
+        for (let i = 0; i <= 5; i++) set(8, i, bit(i)); set(8, 7, bit(6)); set(8, 8, bit(7)); set(7, 8, bit(8)); for (let i = 9; i < 15; i++) set(14 - i, 8, bit(i));
+        for (let i = 0; i < 8; i++) set(size - 1 - i, 8, bit(i)); for (let i = 8; i < 15; i++) set(8, size - 15 + i, bit(i)); set(8, size - 8, true);
+      };
+      format(0);
+      if (v >= 7) { let rem = v; for (let i = 0; i < 12; i++) rem = (rem << 1) ^ ((rem >>> 11) * 0x1F25); const bits = v << 12 | rem; for (let i = 0; i < 18; i++) { const bt = ((bits >>> i) & 1) === 1; const a = size - 11 + i % 3, c = Math.floor(i / 3); set(a, c, bt); set(c, a, bt); } }
+      let i = 0;
+      for (let right = size - 1; right >= 1; right -= 2) { if (right === 6) right = 5; for (let vert = 0; vert < size; vert++) for (let j = 0; j < 2; j++) { const x = right - j; const up = ((right + 1) & 2) === 0; const y = up ? size - 1 - vert : vert; if (!fn[y][x] && i < cw.length * 8) { mod[y][x] = ((cw[i >>> 3] >>> (7 - (i & 7))) & 1) === 1; i++; } } }
+      const maskFn = [(x, y) => (x + y) % 2 === 0, (x, y) => y % 2 === 0, (x, y) => x % 3 === 0, (x, y) => (x + y) % 3 === 0, (x, y) => (Math.floor(x / 3) + Math.floor(y / 2)) % 2 === 0, (x, y) => x * y % 2 + x * y % 3 === 0, (x, y) => (x * y % 2 + x * y % 3) % 2 === 0, (x, y) => ((x + y) % 2 + x * y % 3) % 2 === 0];
+      const apply = (m) => { for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) if (!fn[y][x] && maskFn[m](x, y)) mod[y][x] = !mod[y][x]; };
+      const penalty = () => {
+        let s = 0; const run = (line) => { let r = 0, prev = null; for (const c of line) { if (c === prev) { r++; if (r === 5) s += 3; else if (r > 5) s++; } else { prev = c; r = 1; } } };
+        const pat = (line) => { const w = line.map(c => c ? "1" : "0").join(""); for (let k = 0; k + 11 <= w.length; k++) { const seg = w.slice(k, k + 11); if (seg === "10111010000" || seg === "00001011101") s += 40; } };
+        for (let y = 0; y < size; y++) { run(mod[y]); pat(mod[y]); } for (let x = 0; x < size; x++) { const col = mod.map(row => row[x]); run(col); pat(col); }
+        for (let y = 0; y < size - 1; y++) for (let x = 0; x < size - 1; x++) { const c = mod[y][x]; if (c === mod[y][x + 1] && c === mod[y + 1][x] && c === mod[y + 1][x + 1]) s += 3; }
+        let dark = 0; for (const row of mod) for (const c of row) if (c) dark++; const total = size * size; s += (Math.ceil(Math.abs(dark * 20 - total * 10) / total) - 1) * 10; return s;
+      };
+      let best = 0, bestScore = Infinity;
+      for (let m = 0; m < 8; m++) { apply(m); format(m); const sc = penalty(); if (sc < bestScore) { bestScore = sc; best = m; } apply(m); }
+      apply(best); format(best);
+      return { size, mod };
+    }
+    function encode(text) {
+      const bytes = Array.from(new TextEncoder().encode(text));
+      for (const e of [ECC.M, ECC.L]) for (let v = 1; v <= 10; v++) if (bytes.length + (v < 10 ? 2 : 3) <= capacityBytes(v, e)) return matrix(v, e, codewords(bytes, v, e));
+      throw new Error("Text too long for a QR code");
+    }
+    function svgNode(text, fill) {
+      const { size, mod } = encode(text); const q = 4; const dim = size + q * 2; const ns = "http://www.w3.org/2000/svg";
+      const s = document.createElementNS(ns, "svg"); s.setAttribute("xmlns", ns); s.setAttribute("viewBox", "0 0 " + dim + " " + dim); s.setAttribute("shape-rendering", "crispEdges");
+      const bg = document.createElementNS(ns, "rect"); bg.setAttribute("width", dim); bg.setAttribute("height", dim); bg.setAttribute("fill", "#FFFFFF"); s.append(bg);
+      let d = ""; for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) if (mod[y][x]) d += "M" + (x + q) + " " + (y + q) + "h1v1h-1z";
+      const path = document.createElementNS(ns, "path"); path.setAttribute("d", d); path.setAttribute("fill", fill || "#183760"); s.append(path);
+      return s;
+    }
+    return { svgNode, encode };
+  })();
+
+  // ---------- Slideshow ----------
+  function openSlides(start) {
+    const items = S.lastShown || [];
+    if (!items.length) { toast("Nothing to show yet."); return; }
+    S.slides = items; S.slideIdx = Math.max(0, Math.min(items.length - 1, start || 0));
+    $("#slides-title").textContent = S.board ? S.board.title : "Slideshow";
+    renderSlide(); $("#dlg-slides").showModal(); setTimeout(() => $("#slide-next").focus(), 30);
+  }
+  function renderSlide() {
+    const items = S.slides || []; const it = items[S.slideIdx]; const body = $("#slide-body");
+    if (!it) { body.replaceChildren(h("p", { class: "slide-empty", text: "No posts to show." })); return; }
+    const ctx = S.lastCtx || { b: S.board, ps: {} }; const b = ctx.b; const p = it.p; const a = ctx.ps[p.authorId];
+    const card = h("article", { class: "post slide-card", dataset: { color: p.color || "white" }, "aria-label": p.subject || "Post" });
+    if (it.section) card.append(h("span", { class: "slide-section", text: it.section }));
+    if (isPinned(p)) card.append(h("span", { class: "pin-flag" }, svg(ICON.pin), "Pinned"));
+    if (p.subject) card.append(h("h3", { text: p.subject }));
+    if (p.imageId) card.append(h("img", { class: "attach", src: imgSrc(p.imageId), alt: p.imageAlt || "" }));
+    if (p.body) card.append(h("p", { class: "post-body" }, linkify(p.body)));
+    if (p.link) card.append(linkCard(p.link));
+    const meta = h("div", { class: "post-meta" });
+    if (b.showAuthor && a) meta.append(h("img", { class: "avatar", src: a.avatarUrl, alt: "" }), h("span", { text: a.name || "Someone" }));
+    if (b.showTime) meta.append(h("span", { text: fmtTime(p.createdAt) }));
+    if (b.reactions && b.reactions !== "none") meta.append(reactionSummary(p, b));
+    const n = (p.comments || []).length; if (b.comments && n) meta.append(h("span", { text: n + (n === 1 ? " comment" : " comments") }));
+    if (meta.childElementCount) card.append(meta);
+    body.replaceChildren(card); body.scrollTop = 0;
+    $("#slide-counter").textContent = (S.slideIdx + 1) + " of " + items.length;
+    $("#slide-prev").disabled = S.slideIdx === 0; $("#slide-next").disabled = S.slideIdx >= items.length - 1;
+  }
+  function slideStep(d) { const items = S.slides || []; const n = S.slideIdx + d; if (n < 0 || n >= items.length) return; S.slideIdx = n; renderSlide(); }
+  $("#slide-prev").addEventListener("click", () => slideStep(-1)); $("#slide-next").addEventListener("click", () => slideStep(1));
+  $("#dlg-slides").addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") { e.preventDefault(); slideStep(1); }
+    else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); slideStep(-1); }
+    else if (e.key === "Home") { e.preventDefault(); S.slideIdx = 0; renderSlide(); }
+    else if (e.key === "End") { e.preventDefault(); S.slideIdx = Math.max(0, (S.slides || []).length - 1); renderSlide(); }
+  });
+  $("#dlg-slides").addEventListener("close", () => { S.slides = null; });
+
+  // ---------- Boot ----------
+  async function init() {
+    S.route = routeFromHash(); render();
+    const saved = loadAuth();
+    if (!saved) { showSignIn(null); return; }
+    S.auth = saved;
+    try { const r = await api("POST", null, { op: "hello", name: saved.name }); S.me = saved.uid; S.isAdmin = !!r.admin; S.ready = true; S.users[saved.uid] = { name: saved.name }; updateWho(); onRoute(); }
+    catch (e) { S.auth = null; render(); showSignIn({ code: e.code === "unauthorized" ? "" : saved.code, name: saved.name, admin: saved.admin }); if (e.code !== "unauthorized") { $("#s-err").textContent = e.message || "Could not reach the server."; $("#s-err").hidden = false; } }
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
+})();
+</script>
+</body>
+</html>
